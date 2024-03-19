@@ -12,6 +12,8 @@ import org.apache.parquet.hadoop.example.GroupReadSupport;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.springframework.stereotype.Service;
+
+import java.nio.file.Paths;
 import java.util.logging.Logger;
 import java.io.File;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -19,37 +21,19 @@ import com.amazonaws.services.s3.model.S3Object;
 
 
 @Service
-public class S3Uploader {
+public class S3Service {
     private final String bucketName = "gadi-s3-bukit-test";
     private final String region = "ap-northeast-2";
     private final String accessKey = "AKIAZVIU7KG7IXR2HIGT";
     private final String secretKey = "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";
     private final AmazonS3 s3Client;
-    private static final Logger logger = Logger.getLogger(S3Uploader.class.getName());
+    private static final Logger logger = Logger.getLogger(S3Service.class.getName());
 
-    public S3Uploader() {
+    public S3Service() {
         this.s3Client = AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
                 .build();
-        System.out.println("AmazonS3 client initialized successfully");
-    }
-
-    public void listS3BucketContents() {
-        try {
-            ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(bucketName);
-
-            ObjectListing objectListing;
-            do {
-                objectListing = this.s3Client.listObjects(listObjectsRequest);
-                for (S3ObjectSummary objectSummary : objectListing.getObjectSummaries()) {
-                    System.out.println(" - " + objectSummary.getKey() + "  (size = " + objectSummary.getSize() + ")");
-                }
-                listObjectsRequest.setMarker(objectListing.getNextMarker());
-            } while (objectListing.isTruncated());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void uploadFileToS3(String filePath, String s3Key) {
@@ -64,7 +48,10 @@ public class S3Uploader {
 
     public String readParquetFromS3(String s3Key) {
         ParquetReader<Group> reader = null;
-        File localFile = new File("D:\\Documents\\temp\\" + s3Key.replace("/", "_")); // 슬래시를 밑줄로 변경하여 경로 문제 방지
+        String fileName = Paths.get(s3Key).getFileName().toString().replace("/", "_");
+        String tempDirPath = Paths.get(System.getProperty("user.dir"), "temp").toString();
+        File localFile = new File(tempDirPath, fileName);
+
         try {
             // S3에서 Parquet 파일을 로컬 시스템으로 다운로드
             S3Object s3Object = this.s3Client.getObject(new GetObjectRequest(bucketName, s3Key));
@@ -78,7 +65,7 @@ public class S3Uploader {
             StringBuilder sb = new StringBuilder();
             while ((group = reader.read()) != null) {
                 logger.info(group.toString());
-                sb.append(group.toString());
+                sb.append(group);
                 sb.append("\n");
             }
 
