@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/ticket")
+@RequestMapping("/rest/api/v1/s3/tickets")
 public class TicketController {
     @Autowired
     S3Uploader s3Uploader;
@@ -30,16 +31,15 @@ public class TicketController {
 
     @GetMapping("/makeParquet")
     public String selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end , int temp) {
         List<Ticket> tickets = ticketService.findTicketsByDate(start, end);
-        String outputPath = "path/to/output/tickets.parquet"; // Parquet 파일의 저장 경로 지정
+        String outputPath = "D:\\Documents\\temp\\tickets"+temp+".parquet"; // Parquet 파일의 저장 경로 지정
 
         try {
-            // Ticket 객체를 Parquet 파일로 변환하고 저장하는 로직
             ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
+            Date date = new Date();
 
-            // S3에 Parquet 파일 업로드
-            String s3Key = "your/path/in/s3/tickets.parquet"; // S3 내에서의 파일 경로 및 이름
+            String s3Key = "cs/dev/eca_cs_ticket_tm/base_dt=" + date.getTime();
             s3Uploader.uploadFileToS3(outputPath, s3Key);
 
             return "Parquet file created and uploaded successfully to: " + s3Key;
@@ -52,5 +52,10 @@ public class TicketController {
     @GetMapping("/s3")
     public void hello() {
         s3Uploader.listS3BucketContents();
+    }
+
+    @GetMapping("/ticketParquet")
+    public String selectByPath(@RequestParam("s3key") String s3key) {
+        return s3Uploader.readParquetFromS3(s3key);
     }
 }
