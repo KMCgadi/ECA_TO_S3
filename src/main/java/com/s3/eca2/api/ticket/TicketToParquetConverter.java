@@ -17,35 +17,34 @@ import java.util.List;
 
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
-import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class TicketToParquetConverter {
 
     private static final MessageType SCHEMA = Types.buildMessage()
             // 문자열 필드
-            .addField(Types.primitive(BINARY, REQUIRED).named("title"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("typeCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("statusCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("priorityCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("counselClasCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("counselTypeLargeCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("counselTypeMediumCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("counselTypeSmallCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("memo"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("customerType"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("alimTalkSendYn"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("entityStatus"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("npsUpdateYn"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("suggestionYn"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("templateId"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("surveyStatusCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("vocTransYn"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("counselCateGoryCode"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("initQueue"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("tobeQueue"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("reserveStat"))
-            .addField(Types.primitive(BINARY, REQUIRED).named("transferTemplateContent"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("title"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("typeCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("statusCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("priorityCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselClasCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselTypeLargeCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselTypeMediumCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselTypeSmallCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("memo"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("customerType"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("alimTalkSendYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("entityStatus"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("npsUpdateYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("suggestionYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("templateId"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("surveyStatusCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("vocTransYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselCateGoryCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("initQueue"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("tobeQueue"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("reserveStat"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("transferTemplateContent"))
             // 숫자 필드
             .addField(Types.primitive(BINARY, OPTIONAL).named("entityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("managerId"))
