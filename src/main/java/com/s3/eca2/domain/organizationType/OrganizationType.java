@@ -30,7 +30,7 @@ public class OrganizationType {
     private Date regDate;
 
     @Column(name = "CODE")
-    private String Code;
+    private String code;
 
     @Column(name = "PARENT_CODE")
     private String parentCode;
