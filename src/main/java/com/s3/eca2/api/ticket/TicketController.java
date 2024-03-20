@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -18,14 +20,15 @@ import java.nio.file.Paths;
 @RestController
 @RequestMapping("/rest/api/v1/s3/tickets")
 public class TicketController {
-    @Autowired
-    S3Service s3Service;
+    private final S3Service s3Service;
     private final TicketToParquetConverter ticketToParquetConverter;
     private final TicketService ticketService;
+    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
-    public TicketController(TicketService ticketService, TicketToParquetConverter ticketToParquetConverter) {
+    public TicketController(TicketService ticketService, TicketToParquetConverter ticketToParquetConverter, S3Service s3Service) {
         this.ticketService = ticketService;
         this.ticketToParquetConverter = ticketToParquetConverter;
+        this.s3Service = s3Service;
     }
 
     @GetMapping("/{entityId}")
@@ -41,7 +44,6 @@ public class TicketController {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String formattedDate = date.format(formatter);
         String outputPath = Paths.get(System.getProperty("user.dir"), "temp", formattedDate + ".parquet").toString();
-        System.out.println("경로체크: "+outputPath);
 
         try {
             List<Ticket> tickets = ticketService.findTicketsByDate(start, end);
@@ -52,7 +54,7 @@ public class TicketController {
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(String.valueOf(e));
             return ResponseEntity.internalServerError().body("Failed to create and upload Parquet file.");
         }
     }

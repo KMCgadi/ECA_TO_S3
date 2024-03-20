@@ -17,12 +17,13 @@ import java.util.List;
 
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
+import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class TicketToParquetConverter {
 
-    private static final MessageType SCHEMA = Types.buildMessage()
-            // 문자열 필드
+    private static final MessageType SCHEMA = Types.buildMessage() //티켓 객체에 맞게 설정
+            .addField(Types.primitive(BINARY, REQUIRED).named("entityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("title"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("typeCode"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("statusCode"))
@@ -45,14 +46,11 @@ public class TicketToParquetConverter {
             .addField(Types.primitive(BINARY, OPTIONAL).named("tobeQueue"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reserveStat"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("transferTemplateContent"))
-            // 숫자 필드
-            .addField(Types.primitive(BINARY, OPTIONAL).named("entityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("managerId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("modifyNumber"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reservationPermit"))
-            // 날짜 필드
             .addField(Types.primitive(BINARY, OPTIONAL).named("reservationTime"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("regDate"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("modDate"))
@@ -62,7 +60,6 @@ public class TicketToParquetConverter {
             .addField(Types.primitive(BINARY, OPTIONAL).named("sendDate"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reservationTime2"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reserveModDate"))
-
             .named("Ticket");
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -101,6 +98,7 @@ public class TicketToParquetConverter {
         @Override
         public void write(Ticket ticket) {
             recordConsumer.startMessage();
+            writeOptionalStringField("entityId", ticket.getEntityId());
             writeStringField("title", ticket.getTitle());
             writeStringField("typeCode", ticket.getTypeCode());
             writeStringField("statusCode", ticket.getStatusCode());
@@ -123,16 +121,11 @@ public class TicketToParquetConverter {
             writeStringField("tobeQueue", ticket.getTobeQueue());
             writeStringField("reserveStat", ticket.getReserveStat());
             writeStringField("transferTemplateContent", ticket.getTransferTemplateContent());
-
-            // 숫자 필드는 문자열로 변환하여 기록
-            writeOptionalStringField("entityId", ticket.getEntityId());
             writeOptionalStringField("managerId", ticket.getManagerId());
             writeOptionalStringField("regUserEntityId", ticket.getRegUserEntityId());
             writeOptionalStringField("modUserEntityId", ticket.getModUserEntityId());
             writeOptionalStringField("modifyNumber", ticket.getModifyNumber());
             writeOptionalStringField("reservationPermit", ticket.getReservationPermit());
-
-            // 날짜 필드는 문자열로 변환하여 기록
             writeOptionalDateStringField("reservationTime", ticket.getReservationTime());
             writeOptionalDateStringField("regDate", ticket.getRegDate());
             writeOptionalDateStringField("modDate", ticket.getModDate());

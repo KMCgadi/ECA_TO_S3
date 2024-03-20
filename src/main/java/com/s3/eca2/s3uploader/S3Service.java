@@ -11,10 +11,12 @@ import org.apache.parquet.hadoop.ParquetReader;
 import org.apache.parquet.hadoop.example.GroupReadSupport;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Paths;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.File;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
@@ -22,14 +24,17 @@ import com.amazonaws.services.s3.model.S3Object;
 
 @Service
 public class S3Service {
-    private final String bucketName = "gadi-s3-bukit-test";
-    private final String region = "ap-northeast-2";
-    private final String accessKey = "AKIAZVIU7KG7IXR2HIGT";
-    private final String secretKey = "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";
+    private final String bucketName;
+    private final String region;
     private final AmazonS3 s3Client;
-    private static final Logger logger = Logger.getLogger(S3Service.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(S3Service.class);
 
-    public S3Service() {
+    public S3Service(@Value("${aws.s3.bucketName}") String bucketName,
+                     @Value("${aws.s3.region}") String region,
+                     @Value("${aws.accessKey}") String accessKey,
+                     @Value("${aws.secretKey}") String secretKey) {
+        this.bucketName = bucketName;
+        this.region = region;
         this.s3Client = AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
@@ -40,9 +45,9 @@ public class S3Service {
         try {
             File file = new File(filePath);
             this.s3Client.putObject(new PutObjectRequest(bucketName, s3Key, file));
-            System.out.println("File uploaded successfully to S3 bucket " + bucketName + " as " + s3Key);
+            logger.info("File uploaded successfully to S3 bucket " + bucketName + " as " + s3Key);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -71,14 +76,14 @@ public class S3Service {
 
             return sb.toString();
         } catch (Exception e) {
-            logger.info(e.toString());
+            logger.error(String.valueOf(e));
             return "Failed to download the file from S3: " + e.getMessage();
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 } catch (Exception e) {
-                    logger.info(e.toString());
+                    logger.error(String.valueOf(e));
                 }
             }
             if (localFile.exists()) {
