@@ -18,7 +18,7 @@ public class SurveyResult {
     private long surveyEntityId;
 
     @Column(name = "TICKET_EID")
-    private Long ticketEid;
+    private long ticketEid;
 
     @Column(name = "TEMPLATE_ID")
     private String templateId;
@@ -95,8 +95,8 @@ public class SurveyResult {
     @Column(name = "RESPONSE_DATE")
     private Date responseDate;
 
-    @Column(name = "ENTITY_STATAUS")
-    private String EntityStatus;
+    @Column(name = "ENTITY_STATUS")
+    private String entityStatus;
 
     @Column(name = "MOD_DATE")
     private Date modDate;
@@ -110,7 +110,7 @@ public class SurveyResult {
     @Column(name = "REG_USER_ENTITY_ID")
     private Long regUserEntityId;
 
-    @Column(name = "COUNSEL_TYPE_LARGE_CODE")
+    @Column(name = "COUNSEL_TYPE_LARGE_CD")
     private String counselTypeLargeCode;
 
     @Column(name = "COUNSEL_TYPE_MEDIUM_CD")
@@ -119,9 +119,9 @@ public class SurveyResult {
     @Column(name = "COUNSEL_TYPE_SMALL_CD")
     private String counselTypeSmallCode;
 
-    @Column(name = "CONTACT_CODE")
+    @Column(name = "CONTACT_CD")
     private String contactCode;
 
-    @Column(name = "MANAGER_ID")
+    @Column(name = "MANAGER_EID")
     private Long managerEid;
 }
