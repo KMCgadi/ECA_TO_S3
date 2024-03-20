@@ -2,8 +2,7 @@ package com.s3.eca2.api.ticket;
 
 import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.ticket.TicketService;
-import com.s3.eca2.s3uploader.S3Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.s3.eca2.api.s3.S3Service;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
