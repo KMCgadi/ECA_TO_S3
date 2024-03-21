@@ -14,7 +14,7 @@ import java.util.Date;
 @ToString
 @Entity
 @Table(name = "ECA_CS_TICKET_CHANNEL_TM")
-public class TicketChannel {
+public class Channel {
     @Id
     @Column(name = "TICKET_CHANNEL_EID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

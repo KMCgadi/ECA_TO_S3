@@ -1,6 +1,6 @@
 package com.s3.eca2.api.ticketChannel;
 
-import com.s3.eca2.domain.ticketChannel.TicketChannel;
+import com.s3.eca2.domain.ticketChannel.Channel;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.api.WriteSupport;
@@ -19,7 +19,7 @@ import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
 import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
 
 @Component
-public class TicketChannelToParquetConverter {
+public class ChannelToParquetConverter {
 
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(BINARY, OPTIONAL).named("ticketChannelEid"))
@@ -38,20 +38,20 @@ public class TicketChannelToParquetConverter {
 
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public void writeTicketChannelToParquet(List<TicketChannel> ticketChannels, String fileOutputPath) throws IOException {
-        try (ParquetWriter<TicketChannel> writer = new TicketChannelParquetWriter(new Path(fileOutputPath),SCHEMA)){
-            for (TicketChannel ticketChannel : ticketChannels){
-                writer.write(ticketChannel);
+    public void writeTicketChannelToParquet(List<Channel> channels, String fileOutputPath) throws IOException {
+        try (ParquetWriter<Channel> writer = new TicketChannelParquetWriter(new Path(fileOutputPath),SCHEMA)){
+            for (Channel channel : channels){
+                writer.write(channel);
             }
         }
     }
-    private static class TicketChannelParquetWriter extends ParquetWriter<TicketChannel>{
+    private static class TicketChannelParquetWriter extends ParquetWriter<Channel>{
         public TicketChannelParquetWriter(Path file, MessageType schema) throws IOException {
             super(file, new TicketChannelWriteSupport(schema));
         }
     }
 
-    private static class TicketChannelWriteSupport extends WriteSupport<TicketChannel> {
+    private static class TicketChannelWriteSupport extends WriteSupport<Channel> {
         private MessageType schema;
         private RecordConsumer recordConsumer;
 
@@ -67,20 +67,20 @@ public class TicketChannelToParquetConverter {
         }
 
         @Override
-        public void write(TicketChannel ticketChannel){
+        public void write(Channel channel){
             recordConsumer.startMessage();
-            writeOptionalStringField("ticketChannelEid",ticketChannel.getTicketChannelEid());
-            writeOptionalStringField("entityStatus",ticketChannel.getEntityStatus());
-            writeOptionalDateStringField("modDate",ticketChannel.getModDate());
-            writeOptionalDateStringField("regDate",ticketChannel.getRegDate());
-            writeStringField("contactCode",ticketChannel.getContactCode());
-            writeStringField("endDate",ticketChannel.getEndDate());
-            writeStringField("startDate",ticketChannel.getStartDate());
-            writeOptionalStringField("ticketEid",ticketChannel.getTicketEid());
-            writeOptionalStringField("typeCode",ticketChannel.getTypeCode());
-            writeStringField("processDate",ticketChannel.getProcessDate());
-            writeOptionalStringField("modUserEntityId",ticketChannel.getModUserEntityId());
-            writeOptionalStringField("regUserEntityId",ticketChannel.getRegUserEntityId());
+            writeOptionalStringField("ticketChannelEid", channel.getTicketChannelEid());
+            writeOptionalStringField("entityStatus", channel.getEntityStatus());
+            writeOptionalDateStringField("modDate", channel.getModDate());
+            writeOptionalDateStringField("regDate", channel.getRegDate());
+            writeStringField("contactCode", channel.getContactCode());
+            writeStringField("endDate", channel.getEndDate());
+            writeStringField("startDate", channel.getStartDate());
+            writeOptionalStringField("ticketEid", channel.getTicketEid());
+            writeOptionalStringField("typeCode", channel.getTypeCode());
+            writeStringField("processDate", channel.getProcessDate());
+            writeOptionalStringField("modUserEntityId", channel.getModUserEntityId());
+            writeOptionalStringField("regUserEntityId", channel.getRegUserEntityId());
         }
         private void writeStringField(String fieldName, String value) {
             if (value != null) {

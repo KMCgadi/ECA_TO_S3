@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/surveyResult")
+@RequestMapping("/rest/api/v1/s3/survey-result")
 public class SurveyResultController {
     private final SurveyResultService surveyResultService;
     private final SurveyResultToParquetConverter surveyResultToParquetConverter;

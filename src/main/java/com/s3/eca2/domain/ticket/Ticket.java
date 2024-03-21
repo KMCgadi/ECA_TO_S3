@@ -51,8 +51,8 @@ public class Ticket {
     @Column(name = "RESERVATION_TIME")
     private Date reservationTime;
 
-    @Column(name = "MANAGER_ID")
-    private Long managerId;
+    @Column(name = "MANAGER_EID")
+    private Long managerEid;
 
     @Column(name = "ALIMTALK_SEND_YN")
     private String alimTalkSendYn;

@@ -46,7 +46,7 @@ public class TicketToParquetConverter {
             .addField(Types.primitive(BINARY, OPTIONAL).named("tobeQueue"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reserveStat"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("transferTemplateContent"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("managerId"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("managerEid"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("modifyNumber"))
@@ -121,7 +121,7 @@ public class TicketToParquetConverter {
             writeStringField("tobeQueue", ticket.getTobeQueue());
             writeStringField("reserveStat", ticket.getReserveStat());
             writeStringField("transferTemplateContent", ticket.getTransferTemplateContent());
-            writeOptionalStringField("managerId", ticket.getManagerId());
+            writeOptionalStringField("managerEid", ticket.getManagerEid());
             writeOptionalStringField("regUserEntityId", ticket.getRegUserEntityId());
             writeOptionalStringField("modUserEntityId", ticket.getModUserEntityId());
             writeOptionalStringField("modifyNumber", ticket.getModifyNumber());
