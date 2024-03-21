@@ -1,14 +1,17 @@
 package com.s3.eca2.api.surveyResult;
 
-
 import com.s3.eca2.domain.surveyResult.SurveyResult;
 import org.apache.hadoop.fs.Path;
+import org.apache.parquet.example.data.simple.Primitive;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.api.WriteSupport;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Types;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,6 +24,9 @@ import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
 
 @Component
 public class SurveyResultToParquetConverter {
+
+    private static final Logger logger = LoggerFactory.getLogger(SurveyResultToParquetConverter.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(BINARY, OPTIONAL).named("surveyEntityId"))
@@ -62,13 +68,15 @@ public class SurveyResultToParquetConverter {
             .addField(Types.primitive(BINARY, OPTIONAL).named("managerEid"))
             .named("SurveyResult");
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     public void writeSurveyResultToParquet(List<SurveyResult> surveyResults, String fileOutputPath) throws IOException {
         try (ParquetWriter<SurveyResult> writer = new SurveyResultParquetWriter(new Path(fileOutputPath), SCHEMA)) {
             for (SurveyResult surveyResult : surveyResults) {
+                logger.debug("Writing surveyResult: {}", surveyResult);
                 writer.write(surveyResult);
             }
+        } catch (Exception e) {
+            logger.error("Error writing Parquet file: ", e);
+            throw e;
         }
     }
 
@@ -90,6 +98,7 @@ public class SurveyResultToParquetConverter {
         public WriteContext init(org.apache.hadoop.conf.Configuration configuration) {
             return new WriteContext(schema, new java.util.HashMap<>());
         }
+
         @Override
         public void prepareForWrite(RecordConsumer recordConsumer) {
             this.recordConsumer = recordConsumer;
@@ -98,8 +107,8 @@ public class SurveyResultToParquetConverter {
         @Override
         public void write(SurveyResult surveyResult) {
             recordConsumer.startMessage();
-            writeOptionalStringField("surveyEntityId", surveyResult.getSurveyEntityId());
-            writeOptionalStringField("ticketEid", surveyResult.getTicketEid());
+            writeOptionalStringField("surveyEntityId", String.valueOf(surveyResult.getSurveyEntityId()));
+            writeOptionalStringField("ticketEid", String.valueOf(surveyResult.getTicketEid()));
             writeStringField("templateId", surveyResult.getTemplateId());
             writeStringField("templateTitle", surveyResult.getTemplateTitle());
             writeStringField("token", surveyResult.getToken());
@@ -128,13 +137,23 @@ public class SurveyResultToParquetConverter {
             writeStringField("entityStatus", surveyResult.getEntityStatus());
             writeOptionalDateStringField("modDate", surveyResult.getModDate());
             writeOptionalDateStringField("regDate", surveyResult.getRegDate());
-            writeOptionalStringField("modUserEntityId", surveyResult.getModUserEntityId());
-            writeOptionalStringField("regUserEntityId", surveyResult.getRegUserEntityId());
+            writeOptionalStringField("modUserEntityId", String.valueOf(surveyResult.getModUserEntityId()));
+            writeOptionalStringField("regUserEntityId", String.valueOf(surveyResult.getRegUserEntityId()));
             writeStringField("counselTypeLargeCode", surveyResult.getCounselTypeLargeCode());
             writeStringField("counselTypeMediumCode", surveyResult.getCounselTypeMediumCode());
             writeStringField("counselTypeSmallCode", surveyResult.getCounselTypeSmallCode());
             writeStringField("contactCode", surveyResult.getContactCode());
-            writeOptionalStringField("managerEid", surveyResult.getManagerEid());
+            writeOptionalStringField("managerEid", String.valueOf(surveyResult.getManagerEid()));
+            recordConsumer.endMessage();
+        }
+
+        private void writeOptionalStringField(String fieldName, Object value) {
+            if (value != null) {
+                int fieldIndex = schema.getFieldIndex(fieldName);
+                recordConsumer.startField(fieldName, fieldIndex);
+                recordConsumer.addBinary(Binary.fromString(value.toString()));
+                recordConsumer.endField(fieldName, fieldIndex);
+            }
         }
 
         private void writeStringField(String fieldName, String value) {
@@ -143,18 +162,16 @@ public class SurveyResultToParquetConverter {
                 recordConsumer.startField(fieldName, fieldIndex);
                 recordConsumer.addBinary(Binary.fromString(value));
                 recordConsumer.endField(fieldName, fieldIndex);
-            }
-        }
-
-        private void writeOptionalStringField(String fieldName, Object value) {
-            if (value != null) {
-                writeStringField(fieldName, value.toString());
+            } else {
+                logger.debug("Field {} is null.", fieldName);
             }
         }
 
         private void writeOptionalDateStringField(String fieldName, Date date) {
             if (date != null) {
                 writeStringField(fieldName, dateFormat.format(date));
+            } else {
+                logger.debug("Field {} is null.", fieldName);
             }
         }
     }

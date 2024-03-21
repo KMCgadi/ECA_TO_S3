@@ -1,8 +1,8 @@
 package com.s3.eca2.api.ticketChannel;
 
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.ticketChannel.TicketChannel;
-import com.s3.eca2.domain.ticketChannel.TicketChannelService;
+import com.s3.eca2.domain.ticketChannel.Channel;
+import com.s3.eca2.domain.ticketChannel.ChannelService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,21 +15,21 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/ticketChannel")
-public class TicketChannelController {
+@RequestMapping("/rest/api/v1/s3/channel")
+public class ChannelController {
     private final S3Service s3Service;
-    private final TicketChannelToParquetConverter ticketChannelToParquetConverter;
-    private final TicketChannelService ticketChannelService;
+    private final ChannelToParquetConverter channelToParquetConverter;
+    private final ChannelService channelService;
 
-    public TicketChannelController(TicketChannelService ticketChannelService, TicketChannelToParquetConverter ticketChannelToParquetConverter, S3Service s3Service) {
-        this.ticketChannelService = ticketChannelService;
-        this.ticketChannelToParquetConverter = ticketChannelToParquetConverter;
+    public ChannelController(ChannelService channelService, ChannelToParquetConverter channelToParquetConverter, S3Service s3Service) {
+        this.channelService = channelService;
+        this.channelToParquetConverter = channelToParquetConverter;
         this.s3Service = s3Service;
     }
 
     @GetMapping("/{ticketChannelEid}")
-    public TicketChannel selectOne(@PathVariable long ticketChannelEid) {
-        return ticketChannelService.find(ticketChannelEid);
+    public Channel selectOne(@PathVariable long ticketChannelEid) {
+        return channelService.find(ticketChannelEid);
     }
 
     @GetMapping("/makeParquet")
@@ -43,8 +43,8 @@ public class TicketChannelController {
         System.out.println("경로체크: " + outputPath);
 
         try {
-            List<TicketChannel> ticketChannels = ticketChannelService.findTicketChannelByDate(start, end);
-            ticketChannelToParquetConverter.writeTicketChannelToParquet(ticketChannels, outputPath);
+            List<Channel> channels = channelService.findTicketChannelByDate(start, end);
+            channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
             String s3Key = "cs/dev/eca_ticket_channel_tm/base_dt=" + formattedDate;
             s3Service.uploadFileToS3(outputPath, s3Key);
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
