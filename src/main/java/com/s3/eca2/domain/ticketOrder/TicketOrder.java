@@ -28,7 +28,7 @@ public class TicketOrder {
     @Column(name = "PRODUCT_NAME")
     private String productName;
 
-    @Column(name = "PARTENR_NAME")
+    @Column(name = "PARTNER_NAME")
     private String partnerName;
 
     @Column(name = "BRAND_NAME")
