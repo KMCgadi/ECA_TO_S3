@@ -102,6 +102,9 @@ public class Ticket {
     @Column(name = "COUNSEL_CATEGORY_CD")
     private String counselCateGoryCode;
 
+    @Column(name = "TRANSFER_YN")
+    private String transferYn;
+
     @Column(name = "INIT_QUEUE")
     private String initQueue;
 
@@ -110,6 +113,9 @@ public class Ticket {
 
     @Column(name = "RESERVE_STAT")
     private String reserveStat;
+
+    @Column(name = "STAT_HISOTRY")
+    private Long statHistory;
 
     @Column(name = "RESERVATION_TIME2")
     private Date reservationTime2;
@@ -125,4 +131,7 @@ public class Ticket {
 
     @Column(name = "TRANSFER_TEMPLATE_CONTENT")
     private String transferTemplateContent;
+
+    @Column(name = "MANAGER_MOD_DATE")
+    private Date managerModDate;
 }

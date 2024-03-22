@@ -19,7 +19,7 @@ public class TicketOrderService {
         return ticketOrderRepository.findById(ticketOrderEid)
                 .orElseThrow(() -> new EntityNotFoundException("TicketOrder not found for id: " + ticketOrderEid));
     }
-    public List<TicketOrder> findOrganizationTypeByDate(Date start, Date end) {
+    public List<TicketOrder> findTicketOrderByDate(Date start, Date end) {
         return ticketOrderRepository.findByRegDateBetweenOrModDateBetween(start, end);
     }
 }

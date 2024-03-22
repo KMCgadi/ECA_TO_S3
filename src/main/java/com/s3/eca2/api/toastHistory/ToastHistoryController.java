@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/toastHistory")
+@RequestMapping("/rest/api/v1/s3/toasthistory")
 public class ToastHistoryController {
 
     private final ToastHistoryService toastHistoryService;

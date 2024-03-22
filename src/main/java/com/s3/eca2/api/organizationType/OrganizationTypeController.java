@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/organizationType")
+@RequestMapping("/rest/api/v1/s3/organizationtype")
 public class OrganizationTypeController {
     private final OrganizationTypeService organizationTypeService;
     private final OrganizationToParquetConverter organizationToParquetConverter;
