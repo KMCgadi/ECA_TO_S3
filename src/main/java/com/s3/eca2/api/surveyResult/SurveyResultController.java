@@ -48,7 +48,7 @@ public class SurveyResultController {
             List<SurveyResult> surveyResults = surveyResultService.findSurveyResultByDate(start, end);
             surveyResultToParquetConverter.writeSurveyResultToParquet(surveyResults, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath + "/eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/dev/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath + "/eca_cs_survey_result_tm/parquet/eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
@@ -73,7 +73,7 @@ public class SurveyResultController {
             List<SurveyResult> surveyResults = surveyResultService.findSurveyResultByDate(start, end);
             surveyResultToCSVConverter.writeSurveyResultToCSV(surveyResults, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath + "/eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.csv";
+            String s3Key = "cs/dev/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath + "/eca_cs_survey_result_tm/CSV/eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.csv";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("CSV file created and uploaded successfully to: " + s3Key);
