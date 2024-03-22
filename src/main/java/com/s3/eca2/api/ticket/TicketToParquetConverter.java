@@ -34,32 +34,35 @@ public class TicketToParquetConverter {
             .addField(Types.primitive(BINARY, OPTIONAL).named("counselTypeSmallCode"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("memo"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("customerType"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("reservationTime"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("managerEid"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("alimTalkSendYn"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("entityStatus"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("regDate"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("modDate"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("npsUpdateYn"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("suggestionYn"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("templateId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("surveyStatusCode"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("vocTransYn"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("counselCateGoryCode"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("initQueue"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("tobeQueue"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("reserveStat"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("transferTemplateContent"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("managerEid"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modifyNumber"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("reservationPermit"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("reservationTime"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modDate"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("completeDate"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("templateId"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("startDate"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("endDate"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("sendDate"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("surveyStatusCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("vocTransYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("counselCateGoryCode"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("transferYn"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("initQueue"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("tobeQueue"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("reserveStat"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("statHistory"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reservationTime2"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("modifyNumber"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("reservationPermit"))
             .addField(Types.primitive(BINARY, OPTIONAL).named("reserveModDate"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("transferTemplateContent"))
+            .addField(Types.primitive(BINARY, OPTIONAL).named("managerModDate"))
             .named("Ticket");
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -109,33 +112,35 @@ public class TicketToParquetConverter {
             writeStringField("counselTypeSmallCode", ticket.getCounselTypeSmallCode());
             writeStringField("memo", ticket.getMemo());
             writeStringField("customerType", ticket.getCustomerType());
+            writeOptionalDateStringField("reservationTime", ticket.getReservationTime());
+            writeOptionalStringField("managerEid", ticket.getManagerEid());
             writeStringField("alimTalkSendYn", ticket.getAlimTalkSendYn());
             writeStringField("entityStatus", ticket.getEntityStatus());
+            writeOptionalDateStringField("regDate", ticket.getRegDate());
+            writeOptionalStringField("regUserEntityId", ticket.getRegUserEntityId());
+            writeOptionalDateStringField("modDate", ticket.getModDate());
+            writeOptionalStringField("modUserEntityId", ticket.getModUserEntityId());
             writeStringField("npsUpdateYn", ticket.getNpsUpdateYn());
             writeStringField("suggestionYn", ticket.getSuggestionYn());
-            writeStringField("templateId", ticket.getTemplateId());
-            writeStringField("surveyStatusCode", ticket.getSurveyStatusCode());
-            writeStringField("vocTransYn", ticket.getVocTransYn());
-            writeStringField("counselCateGoryCode", ticket.getCounselCateGoryCode());
-            writeStringField("initQueue", ticket.getInitQueue());
-            writeStringField("tobeQueue", ticket.getTobeQueue());
-            writeStringField("reserveStat", ticket.getReserveStat());
-            writeStringField("transferTemplateContent", ticket.getTransferTemplateContent());
-            writeOptionalStringField("managerEid", ticket.getManagerEid());
-            writeOptionalStringField("regUserEntityId", ticket.getRegUserEntityId());
-            writeOptionalStringField("modUserEntityId", ticket.getModUserEntityId());
-            writeOptionalStringField("modifyNumber", ticket.getModifyNumber());
-            writeOptionalStringField("reservationPermit", ticket.getReservationPermit());
-            writeOptionalDateStringField("reservationTime", ticket.getReservationTime());
-            writeOptionalDateStringField("regDate", ticket.getRegDate());
-            writeOptionalDateStringField("modDate", ticket.getModDate());
             writeOptionalDateStringField("completeDate", ticket.getCompleteDate());
+            writeStringField("templateId", ticket.getTemplateId());
             writeOptionalDateStringField("startDate", ticket.getStartDate());
             writeOptionalDateStringField("endDate", ticket.getEndDate());
             writeOptionalDateStringField("sendDate", ticket.getSendDate());
+            writeStringField("surveyStatusCode", ticket.getSurveyStatusCode());
+            writeStringField("vocTransYn", ticket.getVocTransYn());
+            writeStringField("counselCateGoryCode", ticket.getCounselCateGoryCode());
+            writeStringField("transferYn", ticket.getInitQueue());
+            writeStringField("initQueue", ticket.getInitQueue());
+            writeStringField("tobeQueue", ticket.getTobeQueue());
+            writeStringField("reserveStat", ticket.getReserveStat());
+            writeOptionalStringField("statHistory", ticket.getStatHistory());
             writeOptionalDateStringField("reservationTime2", ticket.getReservationTime2());
+            writeOptionalStringField("modifyNumber", ticket.getModifyNumber());
+            writeOptionalStringField("reservationPermit", ticket.getReservationPermit());
             writeOptionalDateStringField("reserveModDate", ticket.getReserveModDate());
-
+            writeStringField("transferTemplateContent", ticket.getTransferTemplateContent());
+            writeOptionalDateStringField("managerModDate", ticket.getManagerModDate());
             recordConsumer.endMessage();
         }
 
