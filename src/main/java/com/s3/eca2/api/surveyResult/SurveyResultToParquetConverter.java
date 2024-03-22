@@ -24,6 +24,8 @@ import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 public class SurveyResultToParquetConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(SurveyResultToParquetConverter.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(INT64, REQUIRED).named("SURVEY_ENTITY_ID"))
             .addField(Types.primitive(INT64, REQUIRED).named("TICKET_EID"))
@@ -50,11 +52,11 @@ public class SurveyResultToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ANSWER_08"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ANSWER_09"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ANSWER_10"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).as(OriginalType.TIMESTAMP_MILLIS).named("SEND_DATE"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).as(OriginalType.TIMESTAMP_MILLIS).named("RESPONSE_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("SEND_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("RESPONSE_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).as(OriginalType.TIMESTAMP_MILLIS).named("MOD_DATE"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).as(OriginalType.TIMESTAMP_MILLIS).named("REG_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("MOD_USER_ENTITY_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("REG_USER_ENTITY_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("COUNSEL_TYPE_LARGE_CD"))
@@ -129,11 +131,11 @@ public class SurveyResultToParquetConverter {
             writeStringField("ANSWER_08", 22, surveyResult.getAnswer08());
             writeStringField("ANSWER_09", 23, surveyResult.getAnswer09());
             writeStringField("ANSWER_10", 24, surveyResult.getAnswer10());
-            writeDateField("SEND_DATE", 25, surveyResult.getSendDate());
-            writeDateField("RESPONSE_DATE", 26, surveyResult.getResponseDate());
+            writeStringField("SEND_DATE", 25, dateToString(surveyResult.getSendDate()));
+            writeStringField("RESPONSE_DATE", 26, dateToString(surveyResult.getResponseDate()));
             writeStringField("ENTITY_STATUS", 27, surveyResult.getEntityStatus());
-            writeDateField("MOD_DATE", 28, surveyResult.getModDate());
-            writeDateField("REG_DATE", 29, surveyResult.getRegDate());
+            writeStringField("MOD_DATE", 28, dateToString(surveyResult.getModDate()));
+            writeStringField("REG_DATE", 29, dateToString(surveyResult.getRegDate()));
             writeNullableLongField("MOD_USER_ENTITY_ID", 30, surveyResult.getModUserEntityId());
             writeNullableLongField("REG_USER_ENTITY_ID", 31, surveyResult.getRegUserEntityId());
             writeStringField("COUNSEL_TYPE_LARGE_CD", 32, surveyResult.getCounselTypeLargeCode());
@@ -156,6 +158,10 @@ public class SurveyResultToParquetConverter {
                 recordConsumer.addBinary(Binary.fromString(value));
                 recordConsumer.endField(fieldName, fieldIndex);
             }
+        }
+
+        private String dateToString(Date date) {
+            return date != null ? dateFormat.format(date) : null;
         }
 
         private void writeDateField(String fieldName, int fieldIndex, Date date) {

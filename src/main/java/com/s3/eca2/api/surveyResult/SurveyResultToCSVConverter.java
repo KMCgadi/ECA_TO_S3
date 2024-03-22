@@ -5,9 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -18,8 +17,12 @@ public class SurveyResultToCSVConverter {
     private static final Logger logger = LoggerFactory.getLogger(SurveyResultToCSVConverter.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+
     public void writeSurveyResultToCSV(List<SurveyResult> surveyResults, String outputPath) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath), StandardCharsets.UTF_8))) {
+            // CSV 파일 시작에 UTF-8 BOM 추가
+            writer.write('\ufeff');
+
             writer.write(
                     "SURVEY_ENTITY_ID,TICKET_EID,TEMPLATE_ID,TEMPLATE_TITLE,TOKEN,QUESTION_01,QUESTION_02,QUESTION_03,QUESTION_04,QUESTION_05," +
                             "QUESTION_06,QUESTION_07,QUESTION_08,QUESTION_09,QUESTION_10,ANSWER_01,ANSWER_02,ANSWER_03,ANSWER_04,ANSWER_05," +
@@ -28,47 +31,7 @@ public class SurveyResultToCSVConverter {
             );
 
             for (SurveyResult result : surveyResults) {
-                String csvLine = String.format(
-                        "%d,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,%d",
-                        result.getSurveyEntityId(),
-                        result.getTicketEid(),
-                        nullToString(result.getTemplateId()),
-                        nullToString(result.getTemplateTitle()),
-                        nullToString(result.getToken()),
-                        nullToString(result.getQuestion01()),
-                        nullToString(result.getQuestion02()),
-                        nullToString(result.getQuestion03()),
-                        nullToString(result.getQuestion04()),
-                        nullToString(result.getQuestion05()),
-                        nullToString(result.getQuestion06()),
-                        nullToString(result.getQuestion07()),
-                        nullToString(result.getQuestion08()),
-                        nullToString(result.getQuestion09()),
-                        nullToString(result.getQuestion10()),
-                        nullToString(result.getAnswer01()),
-                        nullToString(result.getAnswer02()),
-                        nullToString(result.getAnswer03()),
-                        nullToString(result.getAnswer04()),
-                        nullToString(result.getAnswer05()),
-                        nullToString(result.getAnswer06()),
-                        nullToString(result.getAnswer07()),
-                        nullToString(result.getAnswer08()),
-                        nullToString(result.getAnswer09()),
-                        nullToString(result.getAnswer10()),
-                        dateToString(result.getSendDate()),
-                        dateToString(result.getResponseDate()),
-                        nullToString(result.getEntityStatus()),
-                        dateToString(result.getModDate()),
-                        dateToString(result.getRegDate()),
-                        result.getModUserEntityId(),
-                        result.getRegUserEntityId(),
-                        nullToString(result.getCounselTypeLargeCode()),
-                        nullToString(result.getCounselTypeMediumCode()),
-                        nullToString(result.getCounselTypeSmallCode()),
-                        nullToString(result.getContactCode()),
-                        result.getManagerEid()
-                ).replace("null", ""); // null 값은 빈 문자열로 처리
-                writer.write(csvLine);
+                writer.write(toCsvString(result));
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -76,11 +39,62 @@ public class SurveyResultToCSVConverter {
         }
     }
 
-    private String nullToString(String value) {
-        return value != null ? value : "";
+    private String toCsvString(SurveyResult result) {
+        return String.format(
+                "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"",
+                LongEscapeCsv(result.getSurveyEntityId()),
+                LongEscapeCsv(result.getTicketEid()),
+                escapeCsv(result.getTemplateId()),
+                escapeCsv(result.getTemplateTitle()),
+                escapeCsv(result.getToken()),
+                escapeCsv(result.getQuestion01()),
+                escapeCsv(result.getQuestion02()),
+                escapeCsv(result.getQuestion03()),
+                escapeCsv(result.getQuestion04()),
+                escapeCsv(result.getQuestion05()),
+                escapeCsv(result.getQuestion06()),
+                escapeCsv(result.getQuestion07()),
+                escapeCsv(result.getQuestion08()),
+                escapeCsv(result.getQuestion09()),
+                escapeCsv(result.getQuestion10()),
+                escapeCsv(result.getAnswer01()),
+                escapeCsv(result.getAnswer02()),
+                escapeCsv(result.getAnswer03()),
+                escapeCsv(result.getAnswer04()),
+                escapeCsv(result.getAnswer05()),
+                escapeCsv(result.getAnswer06()),
+                escapeCsv(result.getAnswer07()),
+                escapeCsv(result.getAnswer08()),
+                escapeCsv(result.getAnswer09()),
+                escapeCsv(result.getAnswer10()),
+                dateToString(result.getSendDate()),
+                dateToString(result.getResponseDate()),
+                escapeCsv(result.getEntityStatus()),
+                dateToString(result.getModDate()),
+                dateToString(result.getRegDate()),
+                LongEscapeCsv(result.getModUserEntityId()),
+                LongEscapeCsv(result.getRegUserEntityId()),
+                escapeCsv(result.getCounselTypeLargeCode()),
+                escapeCsv(result.getCounselTypeMediumCode()),
+                escapeCsv(result.getCounselTypeSmallCode()),
+                escapeCsv(result.getContactCode()),
+                result.getManagerEid()
+        );
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) return ""; // null 값은 빈 문자열로 처리
+        value = value.replace("*", ""); // "*" 기호 제거
+        value = value.replace("\n", " "); // 데이터 내의 개행 문자를 공백으로 대체
+        return value; // 쌍따옴표로 묶지 않고 반환
     }
 
     private String dateToString(Date date) {
         return date != null ? dateFormat.format(date) : "";
     }
+    private String LongEscapeCsv(Long value) {
+        // Integer 값 처리, null인 경우 빈 문자열을 반환
+        return value != null ? String.valueOf(value) : "";
+    }
+
 }
