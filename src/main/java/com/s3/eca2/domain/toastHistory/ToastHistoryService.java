@@ -21,7 +21,7 @@ public class ToastHistoryService {
                 .orElseThrow(() -> new EntityNotFoundException("ToastHistory not found for id :" + entityId));
     }
 
-    public List<ToastHistory> findOrganizationTypeByDate(Date start, Date end) {
+    public List<ToastHistory> findToastHistoryByDate(Date start, Date end) {
         return toastHistoryRepository.findByRegDateBetweenOrModDateBetween(start, end);
     }
 }

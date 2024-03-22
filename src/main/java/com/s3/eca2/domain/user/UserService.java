@@ -21,7 +21,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found for id:" + userEid));
     }
 
-    public List<User> findOrganizationTypeByDate(Date start, Date end) {
+    public List<User> findUserByDate(Date start, Date end) {
         return userRepository.findByRegDateBetweenOrModDateBetween(start, end);
     }
 }
