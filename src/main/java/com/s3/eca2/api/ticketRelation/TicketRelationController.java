@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/ticketrelation")
+@RequestMapping("/rest/api/v1/s3/ticket-relation")
 public class TicketRelationController {
     private final S3Service s3Service;
     private final TicketRelationService ticketRelationService;

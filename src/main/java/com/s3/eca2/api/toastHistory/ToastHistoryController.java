@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/toasthistory")
+@RequestMapping("/rest/api/v1/s3/toast-history")
 public class ToastHistoryController {
     private final S3Service s3Service;
     private final ToastHistoryService toastHistoryService;

@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 
 
 @RestController
-@RequestMapping("/rest/api/v1/s3/attachurl")
+@RequestMapping("/rest/api/v1/s3/attach-url")
 public class AttachUrlController {
     private final S3Service s3Service;
     private final AttachUrlService attachUrlService;
