@@ -114,7 +114,7 @@ public class Ticket {
     @Column(name = "RESERVE_STAT")
     private String reserveStat;
 
-    @Column(name = "STAT_HISOTRY")
+    @Column(name = "STAT_HISTORY")
     private Long statHistory;
 
     @Column(name = "RESERVATION_TIME2")
