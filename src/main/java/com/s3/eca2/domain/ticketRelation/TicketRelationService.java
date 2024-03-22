@@ -19,7 +19,7 @@ public class TicketRelationService {
         return ticketRelationRepository.findById(ticketRelationEid)
                 .orElseThrow(() -> new EntityNotFoundException("TicketRelation not found for id :" + ticketRelationEid));
     }
-    public List<TicketRelation> findOrganizationTypeByDate(Date start, Date end) {
+    public List<TicketRelation> findTicketRelationByDate(Date start, Date end) {
         return ticketRelationRepository.findByRegDateBetweenOrModDateBetween(start, end);
     }
 }

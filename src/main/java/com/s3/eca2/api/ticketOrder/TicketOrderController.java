@@ -4,6 +4,7 @@ import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.attachUrl.AttachUrl;
 import com.s3.eca2.domain.ticketOrder.TicketOrder;
 import com.s3.eca2.domain.ticketOrder.TicketOrderService;
+import com.s3.eca2.domain.ticketRelation.TicketRelation;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,11 @@ public class TicketOrderController {
         this.ticketOrderService = ticketOrderService;
         this.ticketOrderToParquetConverter = ticketOrderToParquetConverter;
         this.s3Service = s3Service;
+    }
+
+    @GetMapping("/{ticketOrderEid}")
+    public TicketOrder selectOne(@PathVariable long ticketOrderEid){
+        return ticketOrderService.find(ticketOrderEid);
     }
 
 @GetMapping("/makeParquet")
