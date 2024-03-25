@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 @RestController
-@RequestMapping("/rest/api/v1/s3/ticketorder")
+@RequestMapping("/rest/api/v1/s3/ticket_order")
 public class TicketOrderController {
     private final S3Service s3Service;
     private final TicketOrderService ticketOrderService;
