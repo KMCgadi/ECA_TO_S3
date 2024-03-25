@@ -24,6 +24,7 @@ import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class ChannelToParquetConverter {
+
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(INT64, REQUIRED).named("TICKET_CHANNEL_EID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
@@ -38,12 +39,13 @@ public class ChannelToParquetConverter {
             .addField(Types.optional(INT64).named("MOD_USER_ENTITY_ID"))
             .addField(Types.optional(INT64).named("REG_USER_ENTITY_ID"))
             .named("TicketChannel");
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private static final Logger logger = LoggerFactory.getLogger(ChannelToParquetConverter.class);
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public void writeTicketChannelToParquet(List<Channel> channels, String fileOutputPath) {
-        try (ParquetWriter<Channel> writer = new TicketChannelParquetWriter(new Path(fileOutputPath),SCHEMA)) {
-            for (Channel channel : channels){
+        try (ParquetWriter<Channel> writer = new TicketChannelParquetWriter(new Path(fileOutputPath), SCHEMA)) {
+            for (Channel channel : channels) {
                 writer.write(channel);
             }
         } catch (Exception e) {
@@ -60,7 +62,10 @@ public class ChannelToParquetConverter {
     private static class TicketChannelWriteSupport extends WriteSupport<Channel> {
         private MessageType schema;
         private RecordConsumer recordConsumer;
-        public TicketChannelWriteSupport(MessageType schema) { this.schema = schema;}
+
+        public TicketChannelWriteSupport(MessageType schema) {
+            this.schema = schema;
+        }
 
         @Override
         public WriteContext init(org.apache.hadoop.conf.Configuration configuration) {
@@ -75,18 +80,18 @@ public class ChannelToParquetConverter {
         @Override
         public void write(Channel channel) {
             recordConsumer.startMessage();
-            writeLongField("TICKET_CHANNEL_EID",0, channel.getTicketChannelEid());
-            writeStringField("ENTITY_STATUS",1, channel.getEntityStatus());
-            writeStringField("MOD_DATE",2, dateToString(channel.getModDate()));
-            writeStringField("REG_DATE",3, dateToString(channel.getRegDate()));
-            writeStringField("CONTACT_CD",4, channel.getContactCode());
-            writeStringField("END_DATE",5, channel.getEndDate());
-            writeStringField("START_DATE",6, channel.getStartDate());
-            writeNullableLongField("TICKET_EID",7, channel.getTicketEid());
-            writeStringField("TYPE_CD",8, channel.getTypeCode());
-            writeStringField("PROCESS_DATE",9, channel.getProcessDate());
-            writeNullableLongField("MOD_USER_ENTITY_ID",10, channel.getModUserEntityId());
-            writeNullableLongField("REG_USER_ENTITY_ID",11, channel.getRegUserEntityId());
+            writeLongField("TICKET_CHANNEL_EID", 0, channel.getTicketChannelEid());
+            writeStringField("ENTITY_STATUS", 1, channel.getEntityStatus());
+            writeStringField("MOD_DATE", 2, dateToString(channel.getModDate()));
+            writeStringField("REG_DATE", 3, dateToString(channel.getRegDate()));
+            writeStringField("CONTACT_CD", 4, channel.getContactCode());
+            writeStringField("END_DATE", 5, channel.getEndDate());
+            writeStringField("START_DATE", 6, channel.getStartDate());
+            writeNullableLongField("TICKET_EID", 7, channel.getTicketEid());
+            writeStringField("TYPE_CD", 8, channel.getTypeCode());
+            writeStringField("PROCESS_DATE", 9, channel.getProcessDate());
+            writeNullableLongField("MOD_USER_ENTITY_ID", 10, channel.getModUserEntityId());
+            writeNullableLongField("REG_USER_ENTITY_ID", 11, channel.getRegUserEntityId());
             recordConsumer.endMessage();
         }
 

@@ -13,18 +13,17 @@ import org.apache.parquet.schema.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64;
 import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class SurveyResultToParquetConverter {
-
-    private static final Logger logger = LoggerFactory.getLogger(SurveyResultToParquetConverter.class);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(INT64, REQUIRED).named("SURVEY_ENTITY_ID"))
@@ -66,14 +65,16 @@ public class SurveyResultToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("MANAGER_EID"))
             .named("SurveyResult");
 
+    private static final Logger logger = LoggerFactory.getLogger(SurveyResultToParquetConverter.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     public void writeSurveyResultToParquet(List<SurveyResult> surveyResults, String fileOutputPath) throws IOException {
         try (ParquetWriter<SurveyResult> writer = new SurveyResultParquetWriter(new Path(fileOutputPath), SCHEMA)) {
             for (SurveyResult surveyResult : surveyResults) {
-                logger.debug("Writing surveyResult: {}", surveyResult);
                 writer.write(surveyResult);
             }
         } catch (Exception e) {
-            logger.error("Error writing Parquet file: ", e);
+            logger.error(String.valueOf(e));
             throw e;
         }
     }

@@ -67,8 +67,8 @@ public class TicketToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("TRANSFER_TEMPLATE_CONTENT"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MANAGER_MOD_DATE"))
             .named("Ticket");
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final Logger logger = LoggerFactory.getLogger(TicketToParquetConverter.class);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public void writeTicketsToParquet(List<Ticket> tickets, String fileOutputPath) throws IOException {
         try (ParquetWriter<Ticket> writer = new TicketParquetWriter(new Path(fileOutputPath), SCHEMA)) {
