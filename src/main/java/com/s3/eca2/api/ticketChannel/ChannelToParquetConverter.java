@@ -75,7 +75,7 @@ public class ChannelToParquetConverter {
         @Override
         public void write(Channel channel) {
             recordConsumer.startMessage();
-            writeNullableLongField("TICKET_CHANNEL_EID",0, channel.getTicketChannelEid());
+            writeLongField("TICKET_CHANNEL_EID",0, channel.getTicketChannelEid());
             writeStringField("ENTITY_STATUS",1, channel.getEntityStatus());
             writeStringField("MOD_DATE",2, dateToString(channel.getModDate()));
             writeStringField("REG_DATE",3, dateToString(channel.getRegDate()));
@@ -88,6 +88,12 @@ public class ChannelToParquetConverter {
             writeNullableLongField("MOD_USER_ENTITY_ID",10, channel.getModUserEntityId());
             writeNullableLongField("REG_USER_ENTITY_ID",11, channel.getRegUserEntityId());
             recordConsumer.endMessage();
+        }
+
+        private void writeLongField(String fieldName, int fieldIndex, long value) {
+            recordConsumer.startField(fieldName, fieldIndex);
+            recordConsumer.addLong(value);
+            recordConsumer.endField(fieldName, fieldIndex);
         }
 
         private void writeStringField(String fieldName, int fieldIndex, String value) {
