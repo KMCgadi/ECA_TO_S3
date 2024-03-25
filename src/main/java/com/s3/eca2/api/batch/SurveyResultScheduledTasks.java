@@ -1,9 +1,9 @@
 package com.s3.eca2.api.batch;
 
-import com.s3.eca2.api.attachUrl.AttachUrlToParquetConverter;
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.attachUrl.AttachUrl;
-import com.s3.eca2.domain.attachUrl.AttachUrlService;
+import com.s3.eca2.api.surveyResult.SurveyResultToParquetConverter;
+import com.s3.eca2.domain.surveyResult.SurveyResult;
+import com.s3.eca2.domain.surveyResult.SurveyResultService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,23 +17,23 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class AttachUrlScheduledTasks {
-    private static final Logger logger = LoggerFactory.getLogger(AttachUrlScheduledTasks.class);
-    private final AttachUrlService attachUrlService;
-    private final AttachUrlToParquetConverter attachUrlToParquetConverter;
+public class SurveyResultScheduledTasks {
+    private static final Logger logger = LoggerFactory.getLogger(SurveyResultScheduledTasks.class);
+    private final SurveyResultService surveyResultService;
+    private final SurveyResultToParquetConverter surveyResultToParquetConverter;
     private final S3Service s3Service;
 
-    public AttachUrlScheduledTasks(AttachUrlService attachUrlService, AttachUrlToParquetConverter attachUrlToParquetConverter, S3Service s3Service) {
-        this.attachUrlService = attachUrlService;
-        this.attachUrlToParquetConverter = attachUrlToParquetConverter;
+    public SurveyResultScheduledTasks(SurveyResultService surveyResultService, SurveyResultToParquetConverter surveyResultToParquetConverter, S3Service s3Service) {
+        this.surveyResultService = surveyResultService;
+        this.surveyResultToParquetConverter = surveyResultToParquetConverter;
         this.s3Service = s3Service;
     }
 
     @Scheduled(cron = "0 0 0 * * *")
     public void performParquetConversion() {
-        logger.info("attachUrl batch 시작");
+        logger.info("surveyResult batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        LocalDate yesterday = today.minusDays(1);
+        LocalDate yesterday = today.minusDays(30);
         Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
         Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
@@ -41,15 +41,13 @@ public class AttachUrlScheduledTasks {
         String formattedDateForFileName = today.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = today.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet").toString();
-
+        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.parquet").toString();
         try {
-            List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
-            attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
+            List<SurveyResult> surveyResults = surveyResultService.findSurveyResultByDate(start, end);
+            surveyResultToParquetConverter.writeSurveyResultToParquet(surveyResults, outputPath);
 
-            String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/dev/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath + "/eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
-
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);

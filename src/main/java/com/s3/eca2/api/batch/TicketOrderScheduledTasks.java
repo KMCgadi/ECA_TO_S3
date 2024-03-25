@@ -1,9 +1,9 @@
 package com.s3.eca2.api.batch;
 
-import com.s3.eca2.api.attachUrl.AttachUrlToParquetConverter;
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.attachUrl.AttachUrl;
-import com.s3.eca2.domain.attachUrl.AttachUrlService;
+import com.s3.eca2.api.ticketOrder.TicketOrderToParquetConverter;
+import com.s3.eca2.domain.ticketOrder.TicketOrder;
+import com.s3.eca2.domain.ticketOrder.TicketOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,21 +17,21 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class AttachUrlScheduledTasks {
-    private static final Logger logger = LoggerFactory.getLogger(AttachUrlScheduledTasks.class);
-    private final AttachUrlService attachUrlService;
-    private final AttachUrlToParquetConverter attachUrlToParquetConverter;
+public class TicketOrderScheduledTasks {
+    private static final Logger logger = LoggerFactory.getLogger(TicketScheduledTasks.class);
+    private final TicketOrderService ticketOrderService;
+    private final TicketOrderToParquetConverter ticketOrderToParquetConverter;
     private final S3Service s3Service;
 
-    public AttachUrlScheduledTasks(AttachUrlService attachUrlService, AttachUrlToParquetConverter attachUrlToParquetConverter, S3Service s3Service) {
-        this.attachUrlService = attachUrlService;
-        this.attachUrlToParquetConverter = attachUrlToParquetConverter;
+    public TicketOrderScheduledTasks(TicketOrderService ticketOrderService, TicketOrderToParquetConverter ticketOrderToParquetConverter, S3Service s3Service) {
+        this.ticketOrderService = ticketOrderService;
+        this.ticketOrderToParquetConverter = ticketOrderToParquetConverter;
         this.s3Service = s3Service;
     }
 
     @Scheduled(cron = "0 0 0 * * *")
     public void performParquetConversion() {
-        logger.info("attachUrl batch 시작");
+        logger.info("TicketOrder batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDate yesterday = today.minusDays(1);
         Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
@@ -41,13 +41,13 @@ public class AttachUrlScheduledTasks {
         String formattedDateForFileName = today.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = today.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet").toString();
+        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_order_tm_" + formattedDateForFileName + "_1.parquet").toString();
 
         try {
-            List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
-            attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
+            List<TicketOrder> ticketOrders = ticketOrderService.findTicketOrderByDate(start, end);
+            ticketOrderToParquetConverter.writeTicketOrderToParquet(ticketOrders, outputPath);
 
-            String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/dev/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_order_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
@@ -56,3 +56,4 @@ public class AttachUrlScheduledTasks {
         }
     }
 }
+
