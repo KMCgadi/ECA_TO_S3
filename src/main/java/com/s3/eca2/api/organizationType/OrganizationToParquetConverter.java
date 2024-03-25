@@ -1,6 +1,10 @@
 package com.s3.eca2.api.organizationType;
 
 import com.s3.eca2.domain.organizationType.OrganizationType;
+import org.apache.parquet.schema.OriginalType;
+import org.apache.parquet.schema.PrimitiveType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.apache.parquet.hadoop.ParquetWriter;
 import org.apache.parquet.hadoop.api.WriteSupport;
@@ -9,40 +13,42 @@ import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.MessageType;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.schema.Types;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
-import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
+import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64;
+import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class OrganizationToParquetConverter {
     private static final MessageType SCHEMA = Types.buildMessage()
-            .addField(Types.primitive(BINARY, OPTIONAL).named("organizationTypeEid"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("entityStatus"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("code"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("parentCode"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("depth"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("name"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("orderNum"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("companyCode"))
+            .addField(Types.primitive(INT64, REQUIRED).named("ORGANIZATION_TYPE_EID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("CODE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PARENT_CODE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("DEPTH"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("NAME"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("ORDER_NUM"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("MOD_USER_ENTITY_ID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("REG_USER_ENTITY_ID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("COMPANYCODE"))
             .named("OrganizationType");
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationToParquetConverter.class);
 
     public void writeOrganizationTypeToParquet(List<OrganizationType> organizationTypes, String fileOutputPath) throws IOException {
         try (ParquetWriter<OrganizationType> writer = new OrganizationTypeParquetWriter(new Path(fileOutputPath), SCHEMA)) {
             for (OrganizationType organizationType : organizationTypes) {
                 writer.write(organizationType);
             }
+        } catch (Exception e) {
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -74,36 +80,44 @@ public class OrganizationToParquetConverter {
         @Override
         public void write(OrganizationType organizationType) {
             recordConsumer.startMessage();
-            writeOptionalStringField("organizationTypeEid", organizationType.getOrganizationTypeEid());
-            writeStringField("entityStatus", organizationType.getEntityStatus());
-            writeOptionalDateStringField("modDate", organizationType.getModDate());
-            writeOptionalDateStringField("regDate", organizationType.getRegDate());
-            writeStringField("code", organizationType.getCode());
-            writeStringField("parentCode", organizationType.getParentCode());
-            writeOptionalStringField("depth", organizationType.getDepth());
-            writeStringField("name", organizationType.getName());
-            writeOptionalStringField("orderNum", organizationType.getOrderNum());
-            writeOptionalStringField("modUserEntityId", organizationType.getModUserEntityId());
-            writeOptionalStringField("regUserEntityId", organizationType.getRegUserEntityId());
-            writeOptionalStringField("companyCode", organizationType.getCompanyCode());
+            writeLongField("ORGANIZATION_TYPE_EID", 0, organizationType.getOrganizationTypeEid());
+            writeStringField("ENTITY_STATUS", 1, organizationType.getEntityStatus());
+            writeStringField("MOD_DATE", 2, dateToString(organizationType.getModDate()));
+            writeStringField("REG_DATE", 3, dateToString(organizationType.getRegDate()));
+            writeStringField("CODE", 4, organizationType.getCode());
+            writeStringField("PARENT_CODE", 5, organizationType.getParentCode());
+            writeNullableLongField("DEPTH", 6, organizationType.getDepth());
+            writeStringField("NAME", 7, organizationType.getName());
+            writeNullableLongField("ORDER_NUM", 8, organizationType.getOrderNum());
+            writeNullableLongField("MOD_USER_ENTITY_ID", 9, organizationType.getModUserEntityId());
+            writeNullableLongField("REG_USER_ENTITY_ID", 10, organizationType.getRegUserEntityId());
+            writeNullableLongField("COMPANYCODE", 11, organizationType.getCompanyCode());
             recordConsumer.endMessage();
         }
-        private void writeStringField(String fieldName, String value) {
+
+        private void writeLongField(String fieldName, int fieldIndex, long value) {
+            recordConsumer.startField(fieldName, fieldIndex);
+            recordConsumer.addLong(value);
+            recordConsumer.endField(fieldName, fieldIndex);
+        }
+
+        private void writeStringField(String fieldName, int fieldIndex, String value) {
             if (value != null) {
-                int fieldIndex = schema.getFieldIndex(fieldName);
                 recordConsumer.startField(fieldName, fieldIndex);
                 recordConsumer.addBinary(Binary.fromString(value));
                 recordConsumer.endField(fieldName, fieldIndex);
             }
         }
-        private void writeOptionalStringField(String fieldName, Object value) {
-            if (value != null) {
-                writeStringField(fieldName, value.toString());
-            }
+
+        private String dateToString(Date date) {
+            return date != null ? dateFormat.format(date) : null;
         }
-        private void writeOptionalDateStringField(String fieldName, Date date) {
-            if (date != null) {
-                writeStringField(fieldName, dateFormat.format(date));
+
+        private void writeNullableLongField(String fieldName, int fieldIndex, Long value) {
+            if (value != null) {
+                recordConsumer.startField(fieldName, fieldIndex);
+                recordConsumer.addLong(value);
+                recordConsumer.endField(fieldName, fieldIndex);
             }
         }
     }

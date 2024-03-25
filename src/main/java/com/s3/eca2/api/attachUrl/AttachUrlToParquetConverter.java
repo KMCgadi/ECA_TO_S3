@@ -44,7 +44,7 @@ public class AttachUrlToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_USER_ENTITY_ID"))
             .named("AttachUrl");
 
-    public void writeAttachUrlToParquet(List<AttachUrl> attachUrls, String fileOutputPath) throws IOException {
+    public void writeAttachUrlToParquet(List<AttachUrl> attachUrls, String fileOutputPath) {
         try (ParquetWriter<AttachUrl> writer = new AttachUrlParquetWriter(new Path(fileOutputPath), SCHEMA)) {
             for (AttachUrl attachUrl : attachUrls) {
                 writer.write(attachUrl);
@@ -81,7 +81,6 @@ public class AttachUrlToParquetConverter {
         @Override
         public void write(AttachUrl attachUrl) {
             recordConsumer.startMessage();
-
             writeLongField("ATTACH_URL_EID", 0, attachUrl.getAttachUrlEid());
             writeStringField("LINK_TYPE", 1, attachUrl.getLinkType());
             writeNullableLongField("TICKET_ID", 2, attachUrl.getTicketId());
@@ -94,7 +93,6 @@ public class AttachUrlToParquetConverter {
             writeStringField("REG_USER_ENTITY_ID", 9, attachUrl.getRegUserEntityId());
             writeStringField("MOD_DATE", 10, dateToString(attachUrl.getModDate()));
             writeStringField("MOD_USER_ENTITY_ID", 11, attachUrl.getModUserEntityId());
-
             recordConsumer.endMessage();
         }
 
