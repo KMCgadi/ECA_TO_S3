@@ -42,7 +42,7 @@ public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeForma
     String formattedDateForFileName = date.format(formatter);
     DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     String formattedDateForPath = date.format(formatterForPath);
-    String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ct_attach_url_tm" + formattedDateForFileName + "_1.parquet").toString();
+    String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_order_tm" + formattedDateForFileName + "_1.parquet").toString();
 
     try {
         List<TicketOrder> ticketOrders = ticketOrderService.findTicketOrderByDate(start, end);
