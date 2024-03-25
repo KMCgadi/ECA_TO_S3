@@ -33,7 +33,7 @@ public class SurveyResultScheduledTasks {
     public void performParquetConversion() {
         logger.info("surveyResult batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        LocalDate yesterday = today.minusDays(30);
+        LocalDate yesterday = today.minusDays(1);
         Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
         Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 

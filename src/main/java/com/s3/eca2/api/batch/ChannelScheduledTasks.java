@@ -33,7 +33,7 @@ public class ChannelScheduledTasks {
     public void performParquetConversion() {
         logger.info("channel batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        LocalDate yesterday = today.minusMonths(4);
+        LocalDate yesterday = today.minusDays(1);
         Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
         Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
