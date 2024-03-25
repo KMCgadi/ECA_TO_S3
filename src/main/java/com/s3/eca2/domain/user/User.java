@@ -128,6 +128,6 @@ public class User {
     @Column(name = "REC_MANAGE_YN")
     private String recManageYn;
 
-    @Column(name = "REC_COUNSEL_Yn")
+    @Column(name = "REC_COUNSEL_YN")
     private String recCounselYn;
 }
