@@ -8,42 +8,49 @@ import org.apache.parquet.hadoop.api.WriteSupport;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.OriginalType;
+import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Types;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY;
-import static org.apache.parquet.schema.Type.Repetition.OPTIONAL;
+import static org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64;
+import static org.apache.parquet.schema.Type.Repetition.REQUIRED;
 
 @Component
 public class AttachUrlToParquetConverter {
 
-    private static final MessageType SCHEMA = Types.buildMessage()
-            .addField(Types.primitive(BINARY, OPTIONAL).named("attachUrlEid"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("linkType"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("ticketId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("shortUrl"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("sendDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("submitDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("linkStatus"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("entityStatus"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("regUserEntityId"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modDate"))
-            .addField(Types.primitive(BINARY, OPTIONAL).named("modUserEntityId"))
-            .named("AttachUrl");
-
+    private static final Logger logger = LoggerFactory.getLogger(AttachUrlToParquetConverter.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final MessageType SCHEMA = Types.buildMessage()
+            .addField(Types.primitive(INT64, REQUIRED).named("ATTACH_URL_EID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("LINK_TYPE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("TICKET_ID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("SHORT_URL"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("SEND_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("SUBMIT_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("LINK_STATUS"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_USER_ENTITY_ID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_DATE"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_USER_ENTITY_ID"))
+            .named("AttachUrl");
 
     public void writeAttachUrlToParquet(List<AttachUrl> attachUrls, String fileOutputPath) throws IOException {
         try (ParquetWriter<AttachUrl> writer = new AttachUrlParquetWriter(new Path(fileOutputPath), SCHEMA)) {
             for (AttachUrl attachUrl : attachUrls) {
                 writer.write(attachUrl);
             }
+        } catch (Exception e) {
+            logger.error(String.valueOf(e));
         }
     }
 
@@ -74,40 +81,46 @@ public class AttachUrlToParquetConverter {
         @Override
         public void write(AttachUrl attachUrl) {
             recordConsumer.startMessage();
-            writeOptionalStringField("attachUrlEid", attachUrl.getAttachUrlEid());
-            writeStringField("linkType", attachUrl.getLinkType());
-            writeOptionalStringField("ticketId", attachUrl.getTicketId());
-            writeStringField("shortUrl", attachUrl.getShortUrl());
-            writeOptionalDateStringField("sendDate", attachUrl.getSendDate());
-            writeOptionalDateStringField("submitDate", attachUrl.getSubmitDate());
-            writeStringField("linkStatus", attachUrl.getLinkStatus());
-            writeStringField("entityStatus", attachUrl.getEntityStatus());
-            writeOptionalDateStringField("regDate", attachUrl.getRegDate());
-            writeStringField("regUserEntityId", attachUrl.getRegUserEntityId());
-            writeOptionalDateStringField("modDate", attachUrl.getModDate());
-            writeStringField("modUserEntityId", attachUrl.getModUserEntityId());
+
+            writeLongField("ATTACH_URL_EID", 0, attachUrl.getAttachUrlEid());
+            writeStringField("LINK_TYPE", 1, attachUrl.getLinkType());
+            writeNullableLongField("TICKET_ID", 2, attachUrl.getTicketId());
+            writeStringField("SHORT_URL", 3, attachUrl.getShortUrl());
+            writeStringField("SEND_DATE", 4, dateToString(attachUrl.getSendDate()));
+            writeStringField("SUBMIT_DATE", 5, dateToString(attachUrl.getSubmitDate()));
+            writeStringField("LINK_STATUS", 6, attachUrl.getLinkStatus());
+            writeStringField("ENTITY_STATUS", 7, attachUrl.getEntityStatus());
+            writeStringField("REG_DATE", 8, dateToString(attachUrl.getRegDate()));
+            writeStringField("REG_USER_ENTITY_ID", 9, attachUrl.getRegUserEntityId());
+            writeStringField("MOD_DATE", 10, dateToString(attachUrl.getModDate()));
+            writeStringField("MOD_USER_ENTITY_ID", 11, attachUrl.getModUserEntityId());
 
             recordConsumer.endMessage();
         }
 
-        private void writeStringField(String fieldName, String value) {
+        private void writeLongField(String fieldName, int fieldIndex, long value) {
+            recordConsumer.startField(fieldName, fieldIndex);
+            recordConsumer.addLong(value);
+            recordConsumer.endField(fieldName, fieldIndex);
+        }
+
+        private void writeStringField(String fieldName, int fieldIndex, String value) {
             if (value != null) {
-                int fieldIndex = schema.getFieldIndex(fieldName);
                 recordConsumer.startField(fieldName, fieldIndex);
                 recordConsumer.addBinary(Binary.fromString(value));
                 recordConsumer.endField(fieldName, fieldIndex);
             }
         }
 
-        private void writeOptionalStringField(String fieldName, Object value) {
-            if (value != null) {
-                writeStringField(fieldName, value.toString());
-            }
+        private String dateToString(Date date) {
+            return date != null ? dateFormat.format(date) : null;
         }
 
-        private void writeOptionalDateStringField(String fieldName, Date date) {
-            if (date != null) {
-                writeStringField(fieldName, dateFormat.format(date));
+        private void writeNullableLongField(String fieldName, int fieldIndex, Long value) {
+            if (value != null) {
+                recordConsumer.startField(fieldName, fieldIndex);
+                recordConsumer.addLong(value);
+                recordConsumer.endField(fieldName, fieldIndex);
             }
         }
     }

@@ -20,7 +20,6 @@ public class SurveyResultToCSVConverter {
 
     public void writeSurveyResultToCSV(List<SurveyResult> surveyResults, String outputPath) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath), StandardCharsets.UTF_8))) {
-            // CSV 파일 시작에 UTF-8 BOM 추가
             writer.write('\ufeff');
 
             writer.write(
@@ -83,17 +82,16 @@ public class SurveyResultToCSVConverter {
     }
 
     private String escapeCsv(String value) {
-        if (value == null) return ""; // null 값은 빈 문자열로 처리
-        value = value.replace("*", ""); // "*" 기호 제거
-        value = value.replace("\n", " "); // 데이터 내의 개행 문자를 공백으로 대체
-        return value; // 쌍따옴표로 묶지 않고 반환
+        if (value == null) return "";
+        value = value.replace("*", "");
+        value = value.replace("\n", " ");
+        return value;
     }
 
     private String dateToString(Date date) {
         return date != null ? dateFormat.format(date) : "";
     }
     private String LongEscapeCsv(Long value) {
-        // Integer 값 처리, null인 경우 빈 문자열을 반환
         return value != null ? String.valueOf(value) : "";
     }
 
