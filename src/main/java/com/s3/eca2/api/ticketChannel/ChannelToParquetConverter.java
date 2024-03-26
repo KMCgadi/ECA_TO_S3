@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -85,11 +86,11 @@ public class ChannelToParquetConverter {
             writeStringField("MOD_DATE", 2, dateToString(channel.getModDate()));
             writeStringField("REG_DATE", 3, dateToString(channel.getRegDate()));
             writeStringField("CONTACT_CD", 4, channel.getContactCode());
-            writeStringField("END_DATE", 5, channel.getEndDate());
-            writeStringField("START_DATE", 6, channel.getStartDate());
+            writeDateStringField("END_DATE", 5, channel.getEndDate());
+            writeDateStringField("START_DATE", 6, channel.getStartDate());
             writeNullableLongField("TICKET_EID", 7, channel.getTicketEid());
             writeStringField("TYPE_CD", 8, channel.getTypeCode());
-            writeStringField("PROCESS_DATE", 9, channel.getProcessDate());
+            writeDateStringField("PROCESS_DATE", 9, channel.getProcessDate());
             writeNullableLongField("MOD_USER_ENTITY_ID", 10, channel.getModUserEntityId());
             writeNullableLongField("REG_USER_ENTITY_ID", 11, channel.getRegUserEntityId());
             recordConsumer.endMessage();
@@ -106,6 +107,24 @@ public class ChannelToParquetConverter {
                 recordConsumer.startField(fieldName, fieldIndex);
                 recordConsumer.addBinary(Binary.fromString(value));
                 recordConsumer.endField(fieldName, fieldIndex);
+            }
+        }
+
+        private void writeDateStringField(String fieldName, int fieldIndex, String value) {
+
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            try {
+                Date date = inputFormat.parse(value);
+                String formattedDate = outputFormat.format(date);
+
+                recordConsumer.startField(fieldName, fieldIndex);
+                recordConsumer.addBinary(Binary.fromString(formattedDate));
+                recordConsumer.endField(fieldName, fieldIndex);
+            } catch (ParseException e) {
+                logger.error("날짜 형식 변환 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
 
