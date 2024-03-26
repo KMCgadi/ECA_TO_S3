@@ -44,7 +44,7 @@ public class ChannelController {
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = date.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
+        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
 
         try {
             List<Channel> channels = channelService.findTicketChannelByDate(start, end);

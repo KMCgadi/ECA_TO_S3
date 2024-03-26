@@ -51,7 +51,7 @@ public class TicketController {
             List<Ticket> tickets = ticketService.findTicketsByDate(start, end);
             ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_ticket_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_tm" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/dev/eca_cs_ticket_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);

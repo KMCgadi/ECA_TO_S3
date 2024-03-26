@@ -44,13 +44,13 @@ public class TicketOrderController {
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = date.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_order_tm" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
+        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_order_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
 
         try {
             List<TicketOrder> ticketOrders = ticketOrderService.findTicketOrderByDate(start, end);
             ticketOrderToParquetConverter.writeTicketOrderToParquet(ticketOrders, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_order_tm" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/dev/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_order_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
