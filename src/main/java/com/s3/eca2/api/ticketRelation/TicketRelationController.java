@@ -35,7 +35,7 @@ public class TicketRelationController {
         return ticketRelationService.find(ticketRelationEid);
     }
 
-    @GetMapping("/makeParquet")
+    @PostMapping("/makeParquet")
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
 
