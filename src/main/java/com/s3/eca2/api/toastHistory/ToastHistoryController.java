@@ -24,32 +24,32 @@ public class ToastHistoryController {
     private final ToastHistoryToParquetConverter toastHistoryToParquetConverter;
     private static final Logger logger = LoggerFactory.getLogger(ToastHistoryController.class);
 
-    public ToastHistoryController(ToastHistoryService toastHistoryService, ToastHistoryToParquetConverter toastHistoryToParquetConverter, S3Service s3Service ){
+    public ToastHistoryController(ToastHistoryService toastHistoryService, ToastHistoryToParquetConverter toastHistoryToParquetConverter, S3Service s3Service) {
         this.toastHistoryService = toastHistoryService;
         this.toastHistoryToParquetConverter = toastHistoryToParquetConverter;
-        this. s3Service = s3Service;
+        this.s3Service = s3Service;
     }
 
     @GetMapping("/{entityId}")
-    public ToastHistory selectOne(@PathVariable long entityId){
+    public ToastHistory selectOne(@PathVariable long entityId) {
         return toastHistoryService.find(entityId);
     }
 
     @GetMapping("/makeParquet")
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
         ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = date.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet").toString();
+        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ts_history_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
 
         try {
             List<ToastHistory> toastHistories = toastHistoryService.findToastHistoryByDate(start, end);
             toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
-            String s3Key = "cs/dev/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/dev/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
@@ -58,6 +58,7 @@ public class ToastHistoryController {
             return ResponseEntity.internalServerError().body("Failed to create and upload Parquet file.");
         }
     }
+
     @GetMapping("/getParquet")
     public ResponseEntity<String> selectByPath(@RequestParam("s3key") String s3key) {
         return ResponseEntity.ok(s3Service.readParquetFromS3(s3key));
