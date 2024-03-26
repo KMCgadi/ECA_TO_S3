@@ -31,11 +31,11 @@ public class ChannelToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_DATE"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("CONTACT_CD"))
+            .addField(Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, REQUIRED).as(OriginalType.UTF8).named("CONTACT_CD"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("END_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("START_DATE"))
             .addField(Types.primitive(INT64, REQUIRED).named("TICKET_EID"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("TYPE_CD"))
+            .addField(Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, REQUIRED).as(OriginalType.UTF8).named("TYPE_CD"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PROCESS_DATE"))
             .addField(Types.optional(INT64).named("MOD_USER_ENTITY_ID"))
             .addField(Types.optional(INT64).named("REG_USER_ENTITY_ID"))
@@ -111,9 +111,10 @@ public class ChannelToParquetConverter {
         }
 
         private void writeDateStringField(String fieldName, int fieldIndex, String value) {
+            if (value == null)
+                return;
 
             SimpleDateFormat inputFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-
             SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
             try {
@@ -123,7 +124,7 @@ public class ChannelToParquetConverter {
                 recordConsumer.startField(fieldName, fieldIndex);
                 recordConsumer.addBinary(Binary.fromString(formattedDate));
                 recordConsumer.endField(fieldName, fieldIndex);
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 logger.error("날짜 형식 변환 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
