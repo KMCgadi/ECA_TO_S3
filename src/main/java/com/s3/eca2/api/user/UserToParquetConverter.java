@@ -7,6 +7,7 @@ import org.apache.parquet.hadoop.api.WriteSupport;
 import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.io.api.RecordConsumer;
 import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class UserToParquetConverter {
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("RESIGN_REASON"))
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("TEAM_CD"))
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("UNUSED_REASON_CODE"))
-            .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("USABLE"))
+            .addField(Types.primitive(PrimitiveType.PrimitiveTypeName.BINARY, REQUIRED).as(OriginalType.UTF8).named("USABLE"))
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("WEDDING_DATE"))
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("CTI_EXTENSION"))
             .addField(Types.optional(BINARY).as(OriginalType.UTF8).named("CTI_LOGIN_ID"))
