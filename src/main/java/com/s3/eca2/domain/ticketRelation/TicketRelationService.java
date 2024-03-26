@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.ticketRelation;
 
-import com.s3.eca2.domain.ticketOrder.TicketOrder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

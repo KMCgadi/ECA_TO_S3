@@ -1,8 +1,8 @@
 package com.s3.eca2.domain.toastHistory;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 
 import javax.persistence.*;
 import java.util.Date;

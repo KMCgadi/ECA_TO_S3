@@ -5,10 +5,10 @@ import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.ticket.TicketToParquetConverter;
 import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.ticket.TicketService;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;

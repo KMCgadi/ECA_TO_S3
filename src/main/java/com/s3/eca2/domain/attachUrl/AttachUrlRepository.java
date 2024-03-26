@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.attachUrl;
 
-import com.s3.eca2.domain.ticket.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

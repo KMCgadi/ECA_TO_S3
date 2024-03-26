@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.user;
 
-import com.s3.eca2.domain.toastHistory.ToastHistory;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

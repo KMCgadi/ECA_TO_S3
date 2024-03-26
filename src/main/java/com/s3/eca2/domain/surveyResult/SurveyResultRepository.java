@@ -1,7 +1,5 @@
 package com.s3.eca2.domain.surveyResult;
 
-import com.s3.eca2.domain.attachUrl.AttachUrl;
-import com.s3.eca2.domain.organizationType.OrganizationType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

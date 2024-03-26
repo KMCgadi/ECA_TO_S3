@@ -3,7 +3,6 @@ package com.s3.eca2.api.organizationType;
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.organizationType.OrganizationType;
 import com.s3.eca2.domain.organizationType.OrganizationTypeService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;

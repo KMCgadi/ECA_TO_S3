@@ -4,6 +4,7 @@ import com.s3.eca2.api.organizationType.OrganizationToParquetConverter;
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.organizationType.OrganizationType;
 import com.s3.eca2.domain.organizationType.OrganizationTypeService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
 
 @Component
 public class OrganizationScheduledTasks {
