@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.surveyResult;
 
-import com.s3.eca2.domain.organizationType.OrganizationType;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

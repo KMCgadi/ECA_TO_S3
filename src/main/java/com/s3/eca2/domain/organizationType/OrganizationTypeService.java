@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.organizationType;
 
-import com.s3.eca2.domain.attachUrl.AttachUrl;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

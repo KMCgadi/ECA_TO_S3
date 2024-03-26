@@ -1,6 +1,5 @@
 package com.s3.eca2.domain.toastHistory;
 
-import com.s3.eca2.domain.ticketRelation.TicketRelation;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
