@@ -4,10 +4,10 @@ import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.ticketChannel.ChannelToParquetConverter;
 import com.s3.eca2.domain.ticketChannel.Channel;
 import com.s3.eca2.domain.ticketChannel.ChannelService;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;

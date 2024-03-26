@@ -1,20 +1,20 @@
 package com.s3.eca2.api.ticket;
 
+import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.ticket.TicketService;
-import com.s3.eca2.api.s3.S3Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/rest/api/v1/s3/tickets")
