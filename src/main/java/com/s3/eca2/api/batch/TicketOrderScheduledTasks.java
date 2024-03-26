@@ -47,7 +47,7 @@ public class TicketOrderScheduledTasks {
             List<TicketOrder> ticketOrders = ticketOrderService.findTicketOrderByDate(start, end);
             ticketOrderToParquetConverter.writeTicketOrderToParquet(ticketOrders, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_order_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/prod/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_order_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

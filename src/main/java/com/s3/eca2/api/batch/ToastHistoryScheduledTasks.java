@@ -48,7 +48,7 @@ public class ToastHistoryScheduledTasks {
             List<ToastHistory> toastHistories = toastHistoryService.findToastHistoryByDate(start, end);
             toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
-            String s3Key = "cs/dev/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

@@ -46,7 +46,7 @@ public OrganizationScheduledTasks(OrganizationTypeService organizationTypeServic
             List<OrganizationType> organizationTypes = organizationTypeService.findOrganizationTypeByDate(start, end);
             organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
 
-            String s3Key = "cs/dev/gaea_organization_type_tm/base_dt=" + formattedDateForPath + "/gaea_organization_type_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath + "/gaea_organization_type_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

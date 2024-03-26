@@ -47,7 +47,7 @@ public class AttachUrlScheduledTasks {
             List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
             attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
-            String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

@@ -46,7 +46,7 @@ public class UserScheduledTasks {
             List<User> users = userService.findUserByDate(start, end);
             userToParquetConverter.writeUserToParquet(users, outputPath);
 
-            String s3Key = "cs/dev/gaea_user_tm/base_dt=" + formattedDateForPath + "/gaea_user_tm_" + formattedDateForFileName + "_1.parquet";
+            String s3Key = "cs/prod/gaea_user_tm/base_dt=" + formattedDateForPath + "/gaea_user_tm_" + formattedDateForFileName + "_1.parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
