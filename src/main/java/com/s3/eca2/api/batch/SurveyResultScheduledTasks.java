@@ -38,9 +38,9 @@ public class SurveyResultScheduledTasks {
         Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formattedDateForFileName = today.format(formatter);
+        String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForPath = today.format(formatterForPath);
+        String formattedDateForPath = yesterday.format(formatterForPath);
         String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_survey_result_tm_" + formattedDateForFileName + "_1.parquet").toString();
         try {
             List<SurveyResult> surveyResults = surveyResultService.findSurveyResultByDate(start, end);

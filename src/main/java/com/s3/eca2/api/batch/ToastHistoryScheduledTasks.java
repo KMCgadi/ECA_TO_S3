@@ -39,9 +39,9 @@ public class ToastHistoryScheduledTasks {
         Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formattedDateForFileName = today.format(formatter);
+        String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForPath = today.format(formatterForPath);
+        String formattedDateForPath = yesterday.format(formatterForPath);
         String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet").toString();
 
         try {
