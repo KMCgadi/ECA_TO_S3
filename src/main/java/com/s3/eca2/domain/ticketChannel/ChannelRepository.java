@@ -9,6 +9,6 @@ import java.util.List;
 
 
 public interface ChannelRepository extends JpaRepository<Channel, Long> {
-    @Query("SELECT t FROM Channel t WHERE t.regDate >= :start AND t.regDate <= :end OR t.modDate >= :start AND t.modDate <= :end")
+    @Query("SELECT t FROM Channel t WHERE t.regDate >= :start AND t.regDate <= :end")
     List<Channel> findByRegDateBetweenOrModDateBetween(@Param("start") Date start, @Param("end") Date end);
 }

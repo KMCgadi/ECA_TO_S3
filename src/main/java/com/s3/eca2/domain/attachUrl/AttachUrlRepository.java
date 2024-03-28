@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface AttachUrlRepository extends JpaRepository<AttachUrl,Long> {
 
-    @Query("SELECT t FROM AttachUrl t WHERE t.regDate >= :start AND t.regDate <= :end OR t.modDate >= :start AND t.modDate <= :end")
+//    @Query("SELECT t FROM AttachUrl t WHERE t.regDate >= :start AND t.regDate <= :end OR t.modDate >= :start AND t.modDate <= :end")
+    @Query("SELECT t FROM AttachUrl t WHERE t.regDate >= :start AND t.regDate <= :end")
     List<AttachUrl> findByRegDateBetweenOrModDateBetween(@Param("start") Date start, @Param("end") Date end);
+
 }

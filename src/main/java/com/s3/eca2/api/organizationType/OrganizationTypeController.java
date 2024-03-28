@@ -39,7 +39,7 @@ public class OrganizationTypeController {
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
 
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -50,7 +50,7 @@ public class OrganizationTypeController {
             List<OrganizationType> organizationTypes = organizationTypeService.findOrganizationTypeByDate(start, end);
             organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
 
-            String s3Key = "cs/dev/gaea_organization_type_tm/base_dt=" + formattedDateForPath + "/gaea_organization_type_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath + "/gaea_organization_type_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);

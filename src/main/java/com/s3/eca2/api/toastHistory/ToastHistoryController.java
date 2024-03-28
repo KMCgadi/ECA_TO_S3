@@ -38,7 +38,8 @@ public class ToastHistoryController {
     @PostMapping("/makeParquet")
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+
+        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -49,7 +50,7 @@ public class ToastHistoryController {
             List<ToastHistory> toastHistories = toastHistoryService.findToastHistoryByDate(start, end);
             toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
-            String s3Key = "cs/dev/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);

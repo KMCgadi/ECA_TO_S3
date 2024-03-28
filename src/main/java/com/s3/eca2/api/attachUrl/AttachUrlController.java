@@ -42,7 +42,7 @@ public class AttachUrlController {
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
 
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -53,7 +53,7 @@ public class AttachUrlController {
             List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
             attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
-            String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
@@ -78,7 +78,7 @@ public class AttachUrlController {
             List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
             attachUrlToCSVConverter.writeAttachUrlToCSV(attachUrls, outputPath);
 
-            String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm/CSV/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.csv";
+            String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm/CSV/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.csv";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("CSV file created and uploaded successfully to: " + s3Key);

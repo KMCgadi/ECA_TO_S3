@@ -39,7 +39,7 @@ public class TicketRelationController {
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
 
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = date.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -50,7 +50,7 @@ public class TicketRelationController {
             List<TicketRelation> ticketRelations = ticketRelationService.findTicketRelationByDate(start, end);
             ticketRelationToParquetConverter.writeTicketRelationToParquet(ticketRelations, outputPath);
 
-            String s3Key = "cs/dev/eca_cs_ticket_relation_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
+            String s3Key = "cs/prod/eca_cs_ticket_relation_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
             s3Service.uploadFileToS3(outputPath, s3Key);
 
             return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);

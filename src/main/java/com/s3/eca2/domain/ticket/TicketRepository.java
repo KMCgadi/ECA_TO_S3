@@ -8,6 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
-    @Query("SELECT t FROM Ticket t WHERE t.regDate >= :start AND t.regDate <= :end OR t.modDate >= :start AND t.modDate <= :end")
+    @Query("SELECT t FROM Ticket t WHERE t.regDate >= :start AND t.regDate <= :end")
     List<Ticket> findByRegDateBetweenOrModDateBetween(@Param("start") Date start, @Param("end") Date end);
 }
