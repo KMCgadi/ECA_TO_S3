@@ -54,6 +54,9 @@ public class Ticket {
     @Column(name = "MANAGER_EID")
     private Long managerEid;
 
+    @Column(name = "CUSTOMER_EID")
+    private Long customerEid;
+
     @Column(name = "ALIMTALK_SEND_YN")
     private String alimTalkSendYn;
 
@@ -74,6 +77,9 @@ public class Ticket {
 
     @Column(name = "NPS_UPDATE_YN")
     private String npsUpdateYn;
+
+    @Column(name = "CUSTOMER_ID")
+    private String customerId;
 
     @Column(name = "SUGGESTION_YN")
     private String suggestionYn;

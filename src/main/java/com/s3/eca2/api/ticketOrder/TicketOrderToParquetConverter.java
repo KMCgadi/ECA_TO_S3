@@ -28,8 +28,10 @@ public class TicketOrderToParquetConverter {
     private static final MessageType SCHEMA = Types.buildMessage()
             .addField(Types.primitive(INT64, REQUIRED).named("TICKET_ORDER_EID"))
             .addField(Types.primitive(INT64, REQUIRED).named("TICKET_EID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ORDER_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PRODUCT_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PRODUCT_NAME"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("COUPON_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PARTNER_NAME"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("BRAND_NAME"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("CATEGORY"))
@@ -87,19 +89,21 @@ public class TicketOrderToParquetConverter {
             recordConsumer.startMessage();
             writeLongField("TICKET_ORDER_EID", 0, ticketOrder.getTicketOrderEid());
             writeNullableLongField("TICKET_EID", 1, ticketOrder.getTicketEid());
-            writeStringField("PRODUCT_ID", 2, ticketOrder.getProductId());
-            writeStringField("PRODUCT_NAME", 3, ticketOrder.getProductName());
-            writeStringField("PARTNER_NAME", 4, ticketOrder.getPartnerName());
-            writeStringField("BRAND_NAME", 5, ticketOrder.getBrandName());
-            writeStringField("CATEGORY", 6, ticketOrder.getCateGory());
-            writeStringField("ENTITY_STATUS", 7, ticketOrder.getEntityStatus());
-            writeStringField("MOD_DATE", 8, dateToString(ticketOrder.getModDate()));
-            writeStringField("REG_DATE", 9, dateToString(ticketOrder.getRegDate()));
-            writeNullableLongField("MOD_USER_ENTITY_ID", 10, ticketOrder.getModUserEntityId());
-            writeNullableLongField("REG_USER_ENTITY_ID", 11, ticketOrder.getRegUserEntityId());
-            writeStringField("DELIVERY_METHOD", 12, ticketOrder.getDeliveryMethod());
-            writeStringField("PAYMENT_METHOD", 13, ticketOrder.getPaymentMethod());
-            writeStringField("RATING", 14, ticketOrder.getRating());
+            writeStringField("ORDER_ID", 2, ticketOrder.getOrderId());
+            writeStringField("PRODUCT_ID", 3, ticketOrder.getProductId());
+            writeStringField("PRODUCT_NAME", 4, ticketOrder.getProductName());
+            writeStringField("COUPON_ID", 5, ticketOrder.getCouponId());
+            writeStringField("PARTNER_NAME", 6, ticketOrder.getPartnerName());
+            writeStringField("BRAND_NAME", 7, ticketOrder.getBrandName());
+            writeStringField("CATEGORY", 8, ticketOrder.getCateGory());
+            writeStringField("ENTITY_STATUS", 9, ticketOrder.getEntityStatus());
+            writeStringField("MOD_DATE", 10, dateToString(ticketOrder.getModDate()));
+            writeStringField("REG_DATE", 11, dateToString(ticketOrder.getRegDate()));
+            writeNullableLongField("MOD_USER_ENTITY_ID", 12, ticketOrder.getModUserEntityId());
+            writeNullableLongField("REG_USER_ENTITY_ID", 13, ticketOrder.getRegUserEntityId());
+            writeStringField("DELIVERY_METHOD", 14, ticketOrder.getDeliveryMethod());
+            writeStringField("PAYMENT_METHOD", 15, ticketOrder.getPaymentMethod());
+            writeStringField("RATING", 16, ticketOrder.getRating());
 
             recordConsumer.endMessage();
         }

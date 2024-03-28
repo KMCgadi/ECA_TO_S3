@@ -22,11 +22,17 @@ public class TicketOrder {
     @Column(name = "TICKET_EID")
     private Long ticketEid;
 
+    @Column(name = "ORDER_ID")
+    private String orderId;
+
     @Column(name = "PRODUCT_ID")
     private String productId;
 
     @Column(name = "PRODUCT_NAME")
     private String productName;
+
+    @Column(name = "COUPON_ID")
+    private String couponId;
 
     @Column(name = "PARTNER_NAME")
     private String partnerName;

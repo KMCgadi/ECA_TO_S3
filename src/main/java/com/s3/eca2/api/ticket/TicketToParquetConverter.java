@@ -39,6 +39,7 @@ public class TicketToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("CUSTOMER_TYPE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("RESERVATION_TIME"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("MANAGER_EID"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("CUSTOMER_EID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ALIMTALK_SEND_YN"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ENTITY_STATUS"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("REG_DATE"))
@@ -46,6 +47,7 @@ public class TicketToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("MOD_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("MOD_USER_ENTITY_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("NPS_UPDATE_YN"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("CUSTOMER_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("SUGGESTION_YN"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("COMPLETE_DATE"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("TEMPLATE_ID"))
@@ -120,33 +122,35 @@ public class TicketToParquetConverter {
             writeStringField("CUSTOMER_TYPE", 10, ticket.getCustomerType());
             writeStringField("RESERVATION_TIME", 11, dateToString(ticket.getReservationTime()));  // Date를 String으로 변환
             writeNullableLongField("MANAGER_EID", 12, ticket.getManagerEid());
-            writeStringField("ALIMTALK_SEND_YN", 13, ticket.getAlimTalkSendYn());
-            writeStringField("ENTITY_STATUS", 14, ticket.getEntityStatus());
-            writeStringField("REG_DATE", 15, dateToString(ticket.getRegDate()));  // Date를 String으로 변환
-            writeNullableLongField("REG_USER_ENTITY_ID", 16, ticket.getRegUserEntityId());
-            writeStringField("MOD_DATE", 17, dateToString(ticket.getModDate()));  // Date를 String으로 변환
-            writeNullableLongField("MOD_USER_ENTITY_ID", 18, ticket.getModUserEntityId());
-            writeStringField("NPS_UPDATE_YN", 19, ticket.getNpsUpdateYn());
-            writeStringField("SUGGESTION_YN", 20, ticket.getSuggestionYn());
-            writeStringField("COMPLETE_DATE", 21, dateToString(ticket.getCompleteDate()));  // Date를 String으로 변환
-            writeStringField("TEMPLATE_ID", 22, ticket.getTemplateId());
-            writeStringField("START_DATE", 23, dateToString(ticket.getStartDate()));  // Date를 String으로 변환
-            writeStringField("END_DATE", 24, dateToString(ticket.getEndDate()));  // Date를 String으로 변환
-            writeStringField("SEND_DATE", 25, dateToString(ticket.getSendDate()));  // Date를 String으로 변환
-            writeStringField("SURVEY_STATUS_CD", 26, ticket.getSurveyStatusCode());
-            writeStringField("VOC_TRNS_YN", 27, ticket.getVocTransYn());
-            writeStringField("COUNSEL_CATEGORY_CD", 28, ticket.getCounselCateGoryCode());
-            writeStringField("TRANSFER_YN", 29, ticket.getTransferYn());
-            writeStringField("INIT_QUEUE", 30, ticket.getInitQueue());
-            writeStringField("TOBE_QUEUE", 31, ticket.getTobeQueue());
-            writeStringField("RESERVE_STAT", 32, ticket.getReserveStat());
-            writeNullableLongField("STAT_HISTORY", 33, ticket.getStatHistory());
-            writeStringField("RESERVATION_TIME2", 34, dateToString(ticket.getReservationTime2()));  // Date를 String으로 변환
-            writeNullableLongField("MODIFY_NUMBER", 35, ticket.getModifyNumber());
-            writeNullableLongField("RESERVATION_PERMIT", 36, ticket.getReservationPermit());
-            writeStringField("RESERVE_MOD_DATE", 37, dateToString(ticket.getReserveModDate()));  // Date를 String으로 변환
-            writeStringField("TRANSFER_TEMPLATE_CONTENT", 38, ticket.getTransferTemplateContent());
-            writeStringField("MANAGER_MOD_DATE", 39, dateToString(ticket.getManagerModDate()));  // Date를 String으로 변환
+            writeNullableLongField("CUSTOMER_EID", 13, ticket.getCustomerEid());
+            writeStringField("ALIMTALK_SEND_YN", 14, ticket.getAlimTalkSendYn());
+            writeStringField("ENTITY_STATUS", 15, ticket.getEntityStatus());
+            writeStringField("REG_DATE", 16, dateToString(ticket.getRegDate()));  // Date를 String으로 변환
+            writeNullableLongField("REG_USER_ENTITY_ID", 17, ticket.getRegUserEntityId());
+            writeStringField("MOD_DATE", 18, dateToString(ticket.getModDate()));  // Date를 String으로 변환
+            writeNullableLongField("MOD_USER_ENTITY_ID", 19, ticket.getModUserEntityId());
+            writeStringField("NPS_UPDATE_YN", 20, ticket.getNpsUpdateYn());
+            writeStringField("CUSTOMER_ID", 21, ticket.getCustomerId());
+            writeStringField("SUGGESTION_YN", 22, ticket.getSuggestionYn());
+            writeStringField("COMPLETE_DATE", 23, dateToString(ticket.getCompleteDate()));  // Date를 String으로 변환
+            writeStringField("TEMPLATE_ID", 24, ticket.getTemplateId());
+            writeStringField("START_DATE", 25, dateToString(ticket.getStartDate()));  // Date를 String으로 변환
+            writeStringField("END_DATE", 26, dateToString(ticket.getEndDate()));  // Date를 String으로 변환
+            writeStringField("SEND_DATE", 27, dateToString(ticket.getSendDate()));  // Date를 String으로 변환
+            writeStringField("SURVEY_STATUS_CD", 28, ticket.getSurveyStatusCode());
+            writeStringField("VOC_TRNS_YN", 29, ticket.getVocTransYn());
+            writeStringField("COUNSEL_CATEGORY_CD", 30, ticket.getCounselCateGoryCode());
+            writeStringField("TRANSFER_YN", 31, ticket.getTransferYn());
+            writeStringField("INIT_QUEUE", 32, ticket.getInitQueue());
+            writeStringField("TOBE_QUEUE", 33, ticket.getTobeQueue());
+            writeStringField("RESERVE_STAT", 34, ticket.getReserveStat());
+            writeNullableLongField("STAT_HISTORY", 35, ticket.getStatHistory());
+            writeStringField("RESERVATION_TIME2", 36, dateToString(ticket.getReservationTime2()));  // Date를 String으로 변환
+            writeNullableLongField("MODIFY_NUMBER", 37, ticket.getModifyNumber());
+            writeNullableLongField("RESERVATION_PERMIT", 38, ticket.getReservationPermit());
+            writeStringField("RESERVE_MOD_DATE", 39, dateToString(ticket.getReserveModDate()));  // Date를 String으로 변환
+            writeStringField("TRANSFER_TEMPLATE_CONTENT", 40, ticket.getTransferTemplateContent());
+            writeStringField("MANAGER_MOD_DATE", 41, dateToString(ticket.getManagerModDate()));  // Date를 String으로 변환
             recordConsumer.endMessage();
         }
 
