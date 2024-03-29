@@ -8,6 +8,6 @@ import java.util.Date;
 import java.util.List;
 
 public interface ToastHistoryRepository extends JpaRepository<ToastHistory, Long> {
-    @Query("SELECT t FROM ToastHistory t WHERE t.regDate >= :start AND t.regDate <= :end")
+    @Query("SELECT t FROM ToastHistory t WHERE t.regDate >= :start AND t.regDate <= :end OR t.modDate >= :start AND t.modDate <= :end")
     List<ToastHistory> findByRegDateBetweenOrModDateBetween(@Param("start") Date start, @Param("end") Date end);
 }
