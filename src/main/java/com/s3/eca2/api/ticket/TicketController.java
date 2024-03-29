@@ -5,6 +5,9 @@ import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.ticket.TicketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,29 +40,53 @@ public class TicketController {
 
     @PostMapping("/makeParquet")
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+        // 날짜와 파일 번호를 포맷팅하기 위한 준비
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
+        DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDateForFileName = now.format(fileNameFormatter);
+        String formattedDateForPath = now.format(pathFormatter);
 
-        ZonedDateTime date = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String formattedDateForFileName = date.format(formatter);
-        DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForPath = date.format(formatterForPath);
-        String outputPath =
-                Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet").toString();
+        int pageNumber = 1;
+        final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<Ticket> tickets = ticketService.findTicketsByDate(start, end);
-            ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
+            while (true) {
+                // 페이지 단위로 데이터를 조회합니다.
+                Page<Ticket> ticketsPage = ticketService.findTicketsByDate(start, end, pageable);
+                List<Ticket> tickets = ticketsPage.getContent();
 
-            String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                if (tickets.isEmpty()) {
+                    break; // 조회된 데이터가 없으면 종료
+                }
 
-            return ResponseEntity.ok("Parquet file created and uploaded successfully to: " + s3Key);
+                // 데이터를 Parquet 파일로 변환 및 저장
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + pageNumber + ".parquet").toString();
+                ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
+
+                // 생성된 Parquet 파일을 S3에 업로드
+                String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + pageNumber + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                if (!ticketsPage.hasNext()) {
+                    break;
+                }
+
+                pageNumber++;
+                pageable = pageable.next();
+            }
+
+            return ResponseEntity.ok("Parquet files created and uploaded successfully.");
         } catch (Exception e) {
             logger.error(String.valueOf(e));
-            return ResponseEntity.internalServerError().body("Failed to create and upload Parquet file.");
+            return ResponseEntity.internalServerError().body("Failed to create and upload Parquet files.");
         }
     }
+
 
     @GetMapping("/getParquet")
     public ResponseEntity<String> selectByPath(@RequestParam("s3key") String s3key) {

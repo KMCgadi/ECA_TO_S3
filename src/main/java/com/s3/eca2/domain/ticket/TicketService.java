@@ -1,8 +1,12 @@
 package com.s3.eca2.domain.ticket;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +23,8 @@ public class TicketService {
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found for id: " + entityId));
     }
 
-    public List<Ticket> findTicketsByDate(Date start, Date end) {
-        return ticketRepository.findByRegDateBetweenOrModDateBetween(start, end);
+    // TicketService.java
+    public Page<Ticket> findTicketsByDate(Date start, Date end, Pageable pageable) {
+        return ticketRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
 }
