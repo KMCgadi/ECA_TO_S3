@@ -18,7 +18,7 @@ import java.util.List;
 
 @Component
 public class TicketOrderScheduledTasks {
-    private static final Logger logger = LoggerFactory.getLogger(TicketScheduledTasks.class);
+    private static final Logger logger = LoggerFactory.getLogger(TicketOrderScheduledTasks.class);
     private final TicketOrderService ticketOrderService;
     private final TicketOrderToParquetConverter ticketOrderToParquetConverter;
     private final S3Service s3Service;
