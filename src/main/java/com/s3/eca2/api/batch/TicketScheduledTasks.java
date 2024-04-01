@@ -7,6 +7,9 @@ import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.ticket.TicketService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +32,6 @@ public class TicketScheduledTasks {
         this.ticketToParquetConverter = ticketToParquetConverter;
         this.s3Service = s3Service;
     }
-
     @Scheduled(cron = "0 0 0 * * *")
     public void performParquetConversion() {
         logger.info("Ticket batch 시작");
@@ -42,16 +44,32 @@ public class TicketScheduledTasks {
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0; // 시작 페이지 번호
+        final int pageSize = 400000; // 설정한 페이지 크기
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<Ticket> attachUrls = ticketService.findTicketsByDate(start, end);
-            ticketToParquetConverter.writeTicketsToParquet(attachUrls, outputPath);
+            while (true) {
+                Page<Ticket> ticketsPage = ticketService.findTicketsByDate(start, end, pageable);
+                List<Ticket> tickets = ticketsPage.getContent();
 
-            String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!ticketsPage.hasNext() || tickets.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }

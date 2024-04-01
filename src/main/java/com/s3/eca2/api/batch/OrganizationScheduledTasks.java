@@ -4,8 +4,12 @@ import com.s3.eca2.api.organizationType.OrganizationToParquetConverter;
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.organizationType.OrganizationType;
 import com.s3.eca2.domain.organizationType.OrganizationTypeService;
+import com.s3.eca2.domain.ticketChannel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +44,32 @@ public OrganizationScheduledTasks(OrganizationTypeService organizationTypeServic
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "gaea_organization_type_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0;
+        final int pageSize = 400000;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<OrganizationType> organizationTypes = organizationTypeService.findOrganizationTypeByDate(start, end);
-            organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
+            while (true) {
+                Page<OrganizationType> organizationTypePage = organizationTypeService.findOrganizationTypeByDate(start, end, pageable);
+                List<OrganizationType> organizationTypes = organizationTypePage.getContent();
 
-            String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath + "/gaea_organization_type_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "gaea_organization_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath +
+                        "/gaea_organization_type_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!organizationTypePage.hasNext() || organizationTypes.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }

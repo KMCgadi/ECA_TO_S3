@@ -1,5 +1,7 @@
 package com.s3.eca2.domain.toastHistory;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -20,7 +22,7 @@ public class ToastHistoryService {
                 .orElseThrow(() -> new EntityNotFoundException("ToastHistory not found for id :" + entityId));
     }
 
-    public List<ToastHistory> findToastHistoryByDate(Date start, Date end) {
-        return toastHistoryRepository.findByRegDateBetweenOrModDateBetween(start, end);
+    public Page<ToastHistory> findToastHistoryByDate(Date start, Date end, Pageable pageable) {
+        return toastHistoryRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
 }

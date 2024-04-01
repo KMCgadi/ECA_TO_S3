@@ -2,10 +2,14 @@ package com.s3.eca2.api.batch;
 
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.toastHistory.ToastHistoryToParquetConverter;
+import com.s3.eca2.domain.ticket.Ticket;
 import com.s3.eca2.domain.toastHistory.ToastHistory;
 import com.s3.eca2.domain.toastHistory.ToastHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -42,16 +46,32 @@ public class ToastHistoryScheduledTasks {
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0; // 시작 페이지 번호
+        final int pageSize = 400000; // 설정한 페이지 크기
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<ToastHistory> toastHistories = toastHistoryService.findToastHistoryByDate(start, end);
-            toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
+            while (true) {
+                Page<ToastHistory> toastHistoryPage = toastHistoryService.findToastHistoryByDate(start, end, pageable);
+                List<ToastHistory> toastHistories = toastHistoryPage.getContent();
 
-            String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath + "/eca_ts_history_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_ts_history_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath +
+                        "/eca_ts_history_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!toastHistoryPage.hasNext() || toastHistories.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }

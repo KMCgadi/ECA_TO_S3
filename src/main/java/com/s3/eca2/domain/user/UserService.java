@@ -1,5 +1,7 @@
 package com.s3.eca2.domain.user;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -20,7 +22,7 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("User not found for id:" + userEid));
     }
 
-    public List<User> findUserByDate(Date start, Date end) {
-        return userRepository.findByRegDateBetweenOrModDateBetween(start, end);
+    public Page<User> findUserByDate(Date start, Date end, Pageable pageable) {
+        return userRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
 }

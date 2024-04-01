@@ -6,6 +6,9 @@ import com.s3.eca2.domain.ticketChannel.Channel;
 import com.s3.eca2.domain.ticketChannel.ChannelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +26,7 @@ public class ChannelScheduledTasks {
     private final ChannelToParquetConverter channelToParquetConverter;
     private final S3Service s3Service;
 
-    public ChannelScheduledTasks(ChannelService channelService, ChannelToParquetConverter channelToParquetConverter, S3Service s3Service){
+    public ChannelScheduledTasks(ChannelService channelService, ChannelToParquetConverter channelToParquetConverter, S3Service s3Service) {
         this.channelService = channelService;
         this.channelToParquetConverter = channelToParquetConverter;
         this.s3Service = s3Service;
@@ -41,16 +44,32 @@ public class ChannelScheduledTasks {
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0;
+        final int pageSize = 400000;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<Channel> channels = channelService.findTicketChannelByDate(start, end);
-            channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
+            while (true) {
+                Page<Channel> channelPage = channelService.findTicketChannelByDate(start, end, pageable);
+                List<Channel> channels = channelPage.getContent();
 
-            String s3Key = "cs/prod/eca_cs_ticket_channel_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/eca_cs_ticket_channel_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!channelPage.hasNext() || channels.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }

@@ -2,10 +2,14 @@ package com.s3.eca2.api.batch;
 
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.ticketRelation.TicketRelationToParquetConverter;
+import com.s3.eca2.domain.ticketOrder.TicketOrder;
 import com.s3.eca2.domain.ticketRelation.TicketRelation;
 import com.s3.eca2.domain.ticketRelation.TicketRelationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +27,12 @@ public class TicketRelationScheduledTasks {
     private final TicketRelationToParquetConverter ticketRelationToParquetConverter;
     private final S3Service s3Service;
 
-    public TicketRelationScheduledTasks(TicketRelationService ticketRelationService, TicketRelationToParquetConverter ticketRelationToParquetConverter, S3Service s3Service){
+    public TicketRelationScheduledTasks(TicketRelationService ticketRelationService, TicketRelationToParquetConverter ticketRelationToParquetConverter, S3Service s3Service) {
         this.ticketRelationService = ticketRelationService;
         this.ticketRelationToParquetConverter = ticketRelationToParquetConverter;
         this.s3Service = s3Service;
     }
+
     @Scheduled(cron = "0 0 0 * * *")
     public void performParquetConversion() {
         logger.info("TicketRelation batch 시작");
@@ -40,16 +45,32 @@ public class TicketRelationScheduledTasks {
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0; // 시작 페이지 번호
+        final int pageSize = 400000; // 설정한 페이지 크기
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<TicketRelation> ticketRelations = ticketRelationService.findTicketRelationByDate(start, end);
-            ticketRelationToParquetConverter.writeTicketRelationToParquet(ticketRelations, outputPath);
+            while (true) {
+                Page<TicketRelation> ticketRelationPage = ticketRelationService.findTicketRelationByDate(start, end, pageable);
+                List<TicketRelation> ticketRelations = ticketRelationPage.getContent();
 
-            String s3Key = "cs/prod/eca_cs_ticket_relation_tm/base_dt=" + formattedDateForPath + "/eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_cs_ticket_relation_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                ticketRelationToParquetConverter.writeTicketRelationToParquet(ticketRelations, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/eca_cs_ticket_relation_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!ticketRelationPage.hasNext() || ticketRelations.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }

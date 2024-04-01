@@ -1,5 +1,7 @@
 package com.s3.eca2.domain.attachUrl;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -20,7 +22,7 @@ public class AttachUrlService {
                 .orElseThrow(() -> new EntityNotFoundException("AttachUrl not found for id: " + attachUrlEid));
     }
 
-    public List<AttachUrl> findAttachUrlByDate(Date start, Date end) {
-        return attachUrlRepository.findByRegDateBetweenOrModDateBetween(start, end);
+    public Page<AttachUrl> findAttachUrlByDate(Date start, Date end, Pageable pageable) {
+        return attachUrlRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
 }

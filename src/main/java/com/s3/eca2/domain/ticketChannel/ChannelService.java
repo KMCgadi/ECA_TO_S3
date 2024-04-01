@@ -1,5 +1,7 @@
 package com.s3.eca2.domain.ticketChannel;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -19,7 +21,7 @@ public class ChannelService {
         return channelRepository.findById(ticketChannelEid)
                 .orElseThrow(() -> new EntityNotFoundException("TicketChannel not found for id :" + ticketChannelEid));
     }
-    public List<Channel> findTicketChannelByDate(Date start, Date end) {
-        return channelRepository.findByRegDateBetweenOrModDateBetween(start, end);
+    public Page<Channel> findTicketChannelByDate(Date start, Date end, Pageable pageable) {
+        return channelRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
 }

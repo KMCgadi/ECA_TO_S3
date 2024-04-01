@@ -1,14 +1,11 @@
 package com.s3.eca2.domain.ticket;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class TicketService {

@@ -6,6 +6,9 @@ import com.s3.eca2.domain.attachUrl.AttachUrl;
 import com.s3.eca2.domain.attachUrl.AttachUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,16 +44,32 @@ public class AttachUrlScheduledTasks {
         String formattedDateForFileName = yesterday.format(formatter);
         DateTimeFormatter formatterForPath = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDateForPath = yesterday.format(formatterForPath);
-        String outputPath = Paths.get(System.getProperty("user.dir"), "temp", "eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet").toString();
+
+        int pageNumber = 0;
+        final int pageSize = 400000;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
-            List<AttachUrl> attachUrls = attachUrlService.findAttachUrlByDate(start, end);
-            attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
+            while (true) {
+                Page<AttachUrl> attachUrlPage = attachUrlService.findAttachUrlByDate(start, end, pageable);
+                List<AttachUrl> attachUrls = attachUrlPage.getContent();
 
-            String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath + "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_1.parquet";
-            s3Service.uploadFileToS3(outputPath, s3Key);
+                String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
+                        "eca_ct_attach_url_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
-            logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+                String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +
+                        "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                s3Service.uploadFileToS3(outputPath, s3Key);
+
+                logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
+
+                if (!attachUrlPage.hasNext() || attachUrls.isEmpty()) {
+                    break;
+                }
+                pageNumber++;
+                pageable = pageable.next();
+            }
         } catch (Exception e) {
             logger.error("Failed to create and upload Parquet file.", e);
         }
