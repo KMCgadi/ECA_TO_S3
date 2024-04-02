@@ -62,7 +62,7 @@ public class ToastHistoryController {
                         "eca_ts_history_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
-                String s3Key = "cs/dev/eca_ts_history_tm/base_dt=" + formattedDateForPath +
+                String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath +
                         "/eca_ts_history_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 

@@ -64,7 +64,7 @@ public class AttachUrlController {
                         "eca_ct_attach_url_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
-                String s3Key = "cs/dev/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +
+                String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +
                         "/eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 

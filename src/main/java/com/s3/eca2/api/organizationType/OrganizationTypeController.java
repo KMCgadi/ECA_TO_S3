@@ -63,7 +63,7 @@ public class OrganizationTypeController {
                         "gaea_organization_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
 
-                String s3Key = "cs/dev/gaea_organization_type_tm/base_dt=" + formattedDateForPath +
+                String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath +
                         "/gaea_organization_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 

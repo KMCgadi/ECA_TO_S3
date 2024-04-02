@@ -62,7 +62,7 @@ public class TicketController {
                         "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
 
-                String s3Key = "cs/dev/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
+                String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
                         "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
