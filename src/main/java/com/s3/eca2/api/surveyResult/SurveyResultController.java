@@ -42,7 +42,7 @@ public class SurveyResultController {
 
     @PostMapping("/makeParquet")
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end, @RequestParam int fileNum) {
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
 
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -64,7 +64,7 @@ public class SurveyResultController {
                 surveyResultToParquetConverter.writeSurveyResultToParquet(surveyResults, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_survey_result_tm_" + formattedDateForFileName + "_" + fileNum + ".parquet";
+                        "/eca_cs_survey_result_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
