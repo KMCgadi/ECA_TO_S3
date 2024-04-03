@@ -3,7 +3,6 @@ package com.s3.eca2.api.attachUrl;
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.attachUrl.AttachUrl;
 import com.s3.eca2.domain.attachUrl.AttachUrlService;
-import com.s3.eca2.domain.ticket.Ticket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -61,7 +60,7 @@ public class AttachUrlController {
                 List<AttachUrl> attachUrls = attachUrlPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_ct_attach_url_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
                 String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +
@@ -104,7 +103,7 @@ public class AttachUrlController {
                 List<AttachUrl> attachUrls = attachUrlPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_ct_attach_url_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 attachUrlToCSVConverter.writeAttachUrlToCSV(attachUrls, outputPath);
 
                 String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +

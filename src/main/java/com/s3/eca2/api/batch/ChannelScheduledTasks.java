@@ -59,7 +59,7 @@ public class ChannelScheduledTasks {
                 channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_ticket_channel_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                        "/eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

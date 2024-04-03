@@ -55,7 +55,7 @@ public class AttachUrlScheduledTasks {
                 List<AttachUrl> attachUrls = attachUrlPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_ct_attach_url_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_ct_attach_url_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 attachUrlToParquetConverter.writeAttachUrlToParquet(attachUrls, outputPath);
 
                 String s3Key = "cs/prod/eca_ct_attach_url_tm/base_dt=" + formattedDateForPath +

@@ -2,7 +2,6 @@ package com.s3.eca2.api.batch;
 
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.ticketRelation.TicketRelationToParquetConverter;
-import com.s3.eca2.domain.ticketOrder.TicketOrder;
 import com.s3.eca2.domain.ticketRelation.TicketRelation;
 import com.s3.eca2.domain.ticketRelation.TicketRelationService;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public class TicketRelationScheduledTasks {
                 List<TicketRelation> ticketRelations = ticketRelationPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_ticket_relation_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_ticket_relation_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 ticketRelationToParquetConverter.writeTicketRelationToParquet(ticketRelations, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_ticket_relation_tm/base_dt=" + formattedDateForPath +

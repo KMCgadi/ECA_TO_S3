@@ -59,11 +59,11 @@ public class ChannelController {
                 List<Channel> channels = channelPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_ticket_channel_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                        "/eca_cs_ticket_channel_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 if (!channelPage.hasNext() || channels.isEmpty()) {

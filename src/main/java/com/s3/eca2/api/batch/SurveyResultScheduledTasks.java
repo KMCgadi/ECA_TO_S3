@@ -4,7 +4,6 @@ import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.surveyResult.SurveyResultToParquetConverter;
 import com.s3.eca2.domain.surveyResult.SurveyResult;
 import com.s3.eca2.domain.surveyResult.SurveyResultService;
-import com.s3.eca2.domain.ticket.Ticket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -56,7 +55,7 @@ public class SurveyResultScheduledTasks {
                 List<SurveyResult> surveyResults = surveyResultPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_survey_result_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_survey_result_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 surveyResultToParquetConverter.writeSurveyResultToParquet(surveyResults, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath +

@@ -60,7 +60,7 @@ public class SurveyResultController {
                 List<SurveyResult> surveyResults = surveyResultPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_survey_result_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_survey_result_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 surveyResultToParquetConverter.writeSurveyResultToParquet(surveyResults, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_survey_result_tm/base_dt=" + formattedDateForPath +

@@ -54,7 +54,6 @@ public class TicketController {
 
         try {
             while (true) {
-
                 Page<Ticket> ticketsPage = ticketService.findTicketsByDate(start, end, pageable);
                 List<Ticket> tickets = ticketsPage.getContent();
 

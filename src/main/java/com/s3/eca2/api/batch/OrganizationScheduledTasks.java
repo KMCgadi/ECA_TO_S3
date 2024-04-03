@@ -4,7 +4,6 @@ import com.s3.eca2.api.organizationType.OrganizationToParquetConverter;
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.organizationType.OrganizationType;
 import com.s3.eca2.domain.organizationType.OrganizationTypeService;
-import com.s3.eca2.domain.ticketChannel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -59,7 +58,7 @@ public OrganizationScheduledTasks(OrganizationTypeService organizationTypeServic
                 organizationToParquetConverter.writeOrganizationTypeToParquet(organizationTypes, outputPath);
 
                 String s3Key = "cs/prod/gaea_organization_type_tm/base_dt=" + formattedDateForPath +
-                        "/gaea_organization_type_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                        "/gaea_organization_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 logger.info("Parquet file created and uploaded successfully to: {}", s3Key);

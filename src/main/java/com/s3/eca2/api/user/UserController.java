@@ -1,7 +1,6 @@
 package com.s3.eca2.api.user;
 
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.toastHistory.ToastHistory;
 import com.s3.eca2.domain.user.User;
 import com.s3.eca2.domain.user.UserService;
 import org.slf4j.Logger;
@@ -59,11 +58,11 @@ public class UserController {
                 List<User> users = userPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "gaea_user_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "gaea_user_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 userToParquetConverter.writeUserToParquet(users, outputPath);
 
                 String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath +
-                        "/gaea_user_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                        "/gaea_user_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 if (!userPage.hasNext() || users.isEmpty()) {

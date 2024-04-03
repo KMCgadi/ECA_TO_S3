@@ -1,7 +1,6 @@
 package com.s3.eca2.api.toastHistory;
 
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.ticketRelation.TicketRelation;
 import com.s3.eca2.domain.toastHistory.ToastHistory;
 import com.s3.eca2.domain.toastHistory.ToastHistoryService;
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class ToastHistoryController {
                 List<ToastHistory> toastHistories = toastHistoryPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_ts_history_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_ts_history_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 toastHistoryToParquetConverter.writeToastHistoryToParquet(toastHistories, outputPath);
 
                 String s3Key = "cs/prod/eca_ts_history_tm/base_dt=" + formattedDateForPath +

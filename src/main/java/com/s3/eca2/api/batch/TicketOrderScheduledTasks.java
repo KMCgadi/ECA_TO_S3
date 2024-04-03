@@ -2,7 +2,6 @@ package com.s3.eca2.api.batch;
 
 import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.ticketOrder.TicketOrderToParquetConverter;
-import com.s3.eca2.domain.surveyResult.SurveyResult;
 import com.s3.eca2.domain.ticketOrder.TicketOrder;
 import com.s3.eca2.domain.ticketOrder.TicketOrderService;
 import org.slf4j.Logger;
@@ -56,11 +55,11 @@ public class TicketOrderScheduledTasks {
                 List<TicketOrder> ticketOrders = ticketOrderPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_ticket_order_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_ticket_order_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 ticketOrderToParquetConverter.writeTicketOrderToParquet(ticketOrders, outputPath);
 
                 String s3Key = "cs/prod/eca_cs_ticket_order_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_ticket_order_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                        "/eca_cs_ticket_order_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
