@@ -62,7 +62,7 @@ public class ChannelController {
                         "eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 channelToParquetConverter.writeTicketChannelToParquet(channels, outputPath);
 
-                String s3Key = "cs/prod/eca_cs_ticket_channel/base_dt=" + formattedDateForPath +
+                String s3Key = "cs/prod/eca_cs_ticket_channel_tm/base_dt=" + formattedDateForPath +
                         "/eca_cs_ticket_channel_tm" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
