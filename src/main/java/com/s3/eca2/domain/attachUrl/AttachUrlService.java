@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class AttachUrlService {
