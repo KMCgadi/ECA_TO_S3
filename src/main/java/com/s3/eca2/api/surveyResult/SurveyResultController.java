@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,22 +42,24 @@ public class SurveyResultController {
     }
 
     @PostMapping("/makeParquet")
-    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = now.format(fileNameFormatter);
-        String formattedDateForPath = now.format(pathFormatter);
+        String formattedDateForFileName = start.format(fileNameFormatter);
+        String formattedDateForPath = start.format(pathFormatter);
 
         int pageNumber = 0;
-        final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
+        final int pageSize = 400000;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
             while (true) {
-                Page<SurveyResult> surveyResultPage = surveyResultService.findSurveyResultByDate(start, end, pageable);
+                Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                Date endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+                Page<SurveyResult> surveyResultPage = surveyResultService.findSurveyResultByDate(startDate, endDate, pageable);
                 List<SurveyResult> surveyResults = surveyResultPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
@@ -93,7 +96,7 @@ public class SurveyResultController {
         String formattedDateForPath = now.format(pathFormatter);
 
         int pageNumber = 0;
-        final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
+        final int pageSize = 400000;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {

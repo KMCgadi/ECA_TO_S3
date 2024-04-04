@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,14 +40,13 @@ public class ToastHistoryController {
     }
 
     @PostMapping("/makeParquet")
-    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
+    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = now.format(fileNameFormatter);
-        String formattedDateForPath = now.format(pathFormatter);
+        String formattedDateForFileName = start.format(fileNameFormatter);
+        String formattedDateForPath = start.format(pathFormatter);
 
         int pageNumber = 0;
         final int pageSize = 400000;
@@ -54,7 +54,10 @@ public class ToastHistoryController {
 
         try {
             while (true) {
-                Page<ToastHistory> toastHistoryPage = toastHistoryService.findToastHistoryByDate(start, end, pageable);
+                Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                Date endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+                Page<ToastHistory> toastHistoryPage = toastHistoryService.findToastHistoryByDate(startDate, endDate, pageable);
                 List<ToastHistory> toastHistories = toastHistoryPage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",

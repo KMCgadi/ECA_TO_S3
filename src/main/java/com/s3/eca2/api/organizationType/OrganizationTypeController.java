@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,14 +41,13 @@ public class OrganizationTypeController {
     }
 
     @PostMapping("/makeParquet")
-    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") Date start,
-                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") Date end) {
-        // 날짜와 파일 번호를 포맷팅하기 위한 준비
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusDays(1);
+    public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                               @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = now.format(fileNameFormatter);
-        String formattedDateForPath = now.format(pathFormatter);
+        String formattedDateForFileName = start.format(fileNameFormatter);
+        String formattedDateForPath = start.format(pathFormatter);
 
         int pageNumber = 0;
         final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
@@ -55,8 +55,10 @@ public class OrganizationTypeController {
 
         try {
             while (true) {
+                Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                Date endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                Page<OrganizationType> organizationTypePage = organizationTypeService.findOrganizationTypeByDate(start, end, pageable);
+                Page<OrganizationType> organizationTypePage = organizationTypeService.findOrganizationTypeByDate(startDate, endDate, pageable);
                 List<OrganizationType> organizationTypes = organizationTypePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
