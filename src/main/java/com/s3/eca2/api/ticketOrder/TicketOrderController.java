@@ -44,8 +44,8 @@ public class TicketOrderController {
 
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = start.format(fileNameFormatter);
-        String formattedDateForPath = start.format(pathFormatter);
+        String formattedDateForFileName = end.format(fileNameFormatter);
+        String formattedDateForPath = end.format(pathFormatter);
 
         int pageNumber = 0;
         final int pageSize = 400000;

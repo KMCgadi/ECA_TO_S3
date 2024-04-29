@@ -1,8 +1,8 @@
-package com.s3.eca2.api.ticket;
+package com.s3.eca2.api.settingsCode;
 
 import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.ticket.Ticket;
-import com.s3.eca2.domain.ticket.TicketService;
+import com.s3.eca2.domain.settingsCode.SettingsCode;
+import com.s3.eca2.domain.settingsCode.SettingsCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -19,23 +19,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
-@RestController
-@RequestMapping("/rest/api/v1/s3/tickets")
-public class TicketController {
-    private final S3Service s3Service;
-    private final TicketToParquetConverter ticketToParquetConverter;
-    private final TicketService ticketService;
-    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
-    public TicketController(TicketService ticketService, TicketToParquetConverter ticketToParquetConverter, S3Service s3Service) {
-        this.ticketService = ticketService;
-        this.ticketToParquetConverter = ticketToParquetConverter;
+@RestController
+@RequestMapping("/rest/api/v1/s3/settings-code")
+public class SettingsCodeController {
+    private static final Logger logger = LoggerFactory.getLogger(SettingsCodeController.class);
+    private final SettingsCodeService settingsCodeService;
+    private final SettingsCodeToParquetConverter settingsCodeToParquetConverter;
+    private final S3Service s3Service;
+
+    public SettingsCodeController(SettingsCodeService settingsCodeService, SettingsCodeToParquetConverter settingsCodeToParquetConverter, S3Service s3Service) {
+        this.settingsCodeService = settingsCodeService;
+        this.settingsCodeToParquetConverter = settingsCodeToParquetConverter;
         this.s3Service = s3Service;
     }
 
     @GetMapping("/{entityId}")
-    public Ticket selectOne(@PathVariable long entityId) {
-        return ticketService.find(entityId);
+    public SettingsCode selectOne(@PathVariable long entityId) {
+        return settingsCodeService.find(entityId);
     }
 
     @PostMapping("/makeParquet")
@@ -48,7 +49,7 @@ public class TicketController {
         String formattedDateForPath = end.format(pathFormatter);
 
         int pageNumber = 0;
-        final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
+        final int pageSize = 400000;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
@@ -56,19 +57,19 @@ public class TicketController {
                 Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 Date endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                Page<Ticket> ticketsPage = ticketService.findTicketsByDate(startDate, endDate, pageable);
-                List<Ticket> tickets = ticketsPage.getContent();
+                Page<SettingsCode> settingsCodePage = settingsCodeService.findSettingsCodeByDate(startDate, endDate, pageable);
+                List<SettingsCode> settingsCodes = settingsCodePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
-                ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
+                        "prf_settings_code_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                settingsCodeToParquetConverter.writeSettingsCodeToParquet(settingsCodes, outputPath);
 
-                String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                String s3Key = "cs/prod/prf_settings_code/base_dt=" + formattedDateForPath +
+                        "/prf_settings_code_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
-                if (!ticketsPage.hasNext() || tickets.isEmpty()) {
-                    break; // 조회된 데이터가 없거나 마지막 페이지에 도달하면 종료
+                if (!settingsCodePage.hasNext() || settingsCodes.isEmpty()) {
+                    break;
                 }
                 pageNumber++;
                 pageable = pageable.next();

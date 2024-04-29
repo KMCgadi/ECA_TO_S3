@@ -1,16 +1,18 @@
-package com.s3.eca2.api.ticket;
+package com.s3.eca2.api.counselType;
 
-import com.s3.eca2.api.s3.S3Service;
-import com.s3.eca2.domain.ticket.Ticket;
-import com.s3.eca2.domain.ticket.TicketService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.s3.eca2.domain.counselType.CounselType;
+import com.s3.eca2.domain.counselType.CounselTypeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.s3.eca2.api.s3.S3Service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -19,23 +21,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
-@RestController
-@RequestMapping("/rest/api/v1/s3/tickets")
-public class TicketController {
-    private final S3Service s3Service;
-    private final TicketToParquetConverter ticketToParquetConverter;
-    private final TicketService ticketService;
-    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
-    public TicketController(TicketService ticketService, TicketToParquetConverter ticketToParquetConverter, S3Service s3Service) {
-        this.ticketService = ticketService;
-        this.ticketToParquetConverter = ticketToParquetConverter;
+@RestController
+@RequestMapping("/rest/api/v1/s3/counsel-type")
+public class CounselTypeController {
+    private static final Logger logger = LoggerFactory.getLogger(CounselTypeController.class);
+    private final CounselTypeService counselTypeService;
+    private final CounselTypeToParquetConverter counselTypeToParquetConverter;
+    private final S3Service s3Service;
+
+    public CounselTypeController(CounselTypeService counselTypeService, CounselTypeToParquetConverter counselTypeToParquetConverter, S3Service s3Service) {
+        this.counselTypeService = counselTypeService;
+        this.counselTypeToParquetConverter = counselTypeToParquetConverter;
         this.s3Service = s3Service;
     }
 
-    @GetMapping("/{entityId}")
-    public Ticket selectOne(@PathVariable long entityId) {
-        return ticketService.find(entityId);
+    @GetMapping("/{counselTypeEid}")
+    public CounselType selectOne(@PathVariable long counselTypeEid) {
+        return counselTypeService.find(counselTypeEid);
     }
 
     @PostMapping("/makeParquet")
@@ -56,19 +59,19 @@ public class TicketController {
                 Date startDate = Date.from(start.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 Date endDate = Date.from(end.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                Page<Ticket> ticketsPage = ticketService.findTicketsByDate(startDate, endDate, pageable);
-                List<Ticket> tickets = ticketsPage.getContent();
+                Page<CounselType> counselTypePage = counselTypeService.findCounselTypeByDate(startDate, endDate, pageable);
+                List<CounselType> counselTypeTypes = counselTypePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
-                ticketToParquetConverter.writeTicketsToParquet(tickets, outputPath);
+                        "eca_cs_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                counselTypeToParquetConverter.writeCounselTypeToParquet(counselTypeTypes, outputPath);
 
-                String s3Key = "cs/prod/eca_cs_ticket_tm/base_dt=" + formattedDateForPath +
-                        "/eca_cs_ticket_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                String s3Key = "cs/prod/eca_cs_type_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
-                if (!ticketsPage.hasNext() || tickets.isEmpty()) {
-                    break; // 조회된 데이터가 없거나 마지막 페이지에 도달하면 종료
+                if (!counselTypePage.hasNext() || counselTypeTypes.isEmpty()) {
+                    break;
                 }
                 pageNumber++;
                 pageable = pageable.next();
