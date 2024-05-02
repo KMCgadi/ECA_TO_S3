@@ -1,6 +1,5 @@
 package com.s3.eca2.api.settingsCode;
 
-import com.s3.eca2.domain.counselType.CounselType;
 import com.s3.eca2.domain.settingsCode.SettingsCode;
 import org.apache.hadoop.fs.Path;
 import org.apache.parquet.hadoop.ParquetWriter;

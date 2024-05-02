@@ -1,7 +1,7 @@
 package com.s3.eca2.api.batch;
 
-import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.api.counselType.CounselTypeToParquetConverter;
+import com.s3.eca2.api.s3.S3Service;
 import com.s3.eca2.domain.counselType.CounselType;
 import com.s3.eca2.domain.counselType.CounselTypeService;
 import org.slf4j.Logger;
