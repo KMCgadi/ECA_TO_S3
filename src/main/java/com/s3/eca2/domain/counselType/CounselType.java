@@ -28,13 +28,13 @@ public class CounselType {
     private Date regDate;
 
     @Column(name = "DEPTH")
-    private long depth;
+    private Long depth;
 
     @Column(name = "NAME", length = 100)
     private String name;
 
     @Column(name = "ORDER_NUM")
-    private long orderNum;
+    private Long orderNum;
 
     @Column(name = "CODE", length = 20)
     private String code;

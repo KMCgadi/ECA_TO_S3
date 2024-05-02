@@ -41,7 +41,7 @@ public class CounselTypeToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("REG_USER_ENTITY_ID"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("CONTACT_TYPES"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("TICKET_TYPES"))
-            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.INT64).named("DESCRIPTION"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("DESCRIPTION"))
             .named("CounselType");
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

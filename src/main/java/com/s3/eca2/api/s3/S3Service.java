@@ -46,8 +46,11 @@ public class S3Service {
             File file = new File(filePath);
             this.s3Client.putObject(new PutObjectRequest(bucketName, s3Key, file));
             logger.info("File uploaded successfully to S3 bucket " + bucketName + " as " + s3Key);
+
+            if (!file.delete())
+                logger.error("Failed to delete local file: " + filePath);
         } catch (Exception e) {
-            logger.error(String.valueOf(e));
+            logger.error("Failed to upload file to S3", e);
         }
     }
 
