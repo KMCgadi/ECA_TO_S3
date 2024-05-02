@@ -23,4 +23,8 @@ public class CounselTypeService {
     public Page<CounselType> findCounselTypeByDate(Date start, Date end, Pageable pageable) {
         return counselTypeRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
+
+    public Page<CounselType> findAllCounselTypes(Pageable pageable) {
+        return counselTypeRepository.findAll(pageable);
+    }
 }

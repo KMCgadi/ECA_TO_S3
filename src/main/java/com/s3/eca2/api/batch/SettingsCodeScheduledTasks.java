@@ -37,8 +37,6 @@ public class SettingsCodeScheduledTasks {
         logger.info("SettingsCode batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDate yesterday = today.minusDays(1);
-        Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
-        Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = yesterday.format(formatter);
@@ -51,7 +49,7 @@ public class SettingsCodeScheduledTasks {
 
         try {
             while (true) {
-                Page<SettingsCode> settingsCodePage = settingsCodeService.findSettingsCodeByDate(start, end, pageable);
+                Page<SettingsCode> settingsCodePage = settingsCodeService.findAllSettingsCodes(pageable);
                 List<SettingsCode> settingsCodes = settingsCodePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",

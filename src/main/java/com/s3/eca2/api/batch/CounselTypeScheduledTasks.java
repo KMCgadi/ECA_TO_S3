@@ -37,8 +37,6 @@ public class CounselTypeScheduledTasks {
         logger.info("CounselType batch 시작");
         LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
         LocalDate yesterday = today.minusDays(1);
-        Date start = Date.from(yesterday.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
-        Date end = Date.from(today.atStartOfDay(ZoneId.of("Asia/Seoul")).toInstant());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String formattedDateForFileName = yesterday.format(formatter);
@@ -46,12 +44,12 @@ public class CounselTypeScheduledTasks {
         String formattedDateForPath = yesterday.format(formatterForPath);
 
         int pageNumber = 0;
-        final int pageSize = 400000;
+        final int pageSize = 400000; // 페이지 크기 설정
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
         try {
             while (true) {
-                Page<CounselType> counselTypePage = counselTypeService.findCounselTypeByDate(start, end, pageable);
+                Page<CounselType> counselTypePage = counselTypeService.findAllCounselTypes(pageable);
                 List<CounselType> counselTypes = counselTypePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",

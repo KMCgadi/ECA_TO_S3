@@ -23,4 +23,8 @@ public class SettingsCodeService {
     public Page<SettingsCode> findSettingsCodeByDate(Date start, Date end, Pageable pageable) {
         return settingsCodeRepository.findByRegDateBetweenOrModDateBetween(start, end, pageable);
     }
+
+    public Page<SettingsCode> findAllSettingsCodes(Pageable pageable) {
+        return settingsCodeRepository.findAll(pageable);
+    }
 }
