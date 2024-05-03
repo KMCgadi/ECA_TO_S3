@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -53,11 +52,11 @@ public class CounselTypeScheduledTasks {
                 List<CounselType> counselTypes = counselTypePage.getContent();
 
                 String outputPath = Paths.get(System.getProperty("user.dir"), "temp",
-                        "eca_counsel_type_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
+                        "eca_cs_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet").toString();
                 counselTypeToParquetConverter.writeCounselTypeToParquet(counselTypes, outputPath);
 
-                String s3Key = "cs/prod/eca_counsel_type/base_dt=" + formattedDateForPath +
-                        "/eca_counsel_type_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
+                String s3Key = "cs/prod/eca_cs_type_tm/base_dt=" + formattedDateForPath +
+                        "/eca_cs_type_tm_" + formattedDateForFileName + "_" + (pageNumber + 1) + ".parquet";
                 s3Service.uploadFileToS3(outputPath, s3Key);
 
                 logger.info("Parquet file created and uploaded successfully to: {}", s3Key);
