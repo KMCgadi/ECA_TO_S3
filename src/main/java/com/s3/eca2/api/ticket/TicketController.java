@@ -44,8 +44,8 @@ public class TicketController {
 
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = end.format(fileNameFormatter);
-        String formattedDateForPath = end.format(pathFormatter);
+        String formattedDateForFileName = start.format(fileNameFormatter);
+        String formattedDateForPath = start.format(pathFormatter);
 
         int pageNumber = 0;
         final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
