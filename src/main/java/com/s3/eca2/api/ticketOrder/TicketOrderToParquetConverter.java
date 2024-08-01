@@ -43,6 +43,7 @@ public class TicketOrderToParquetConverter {
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("DELIVERY_METHOD"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("PAYMENT_METHOD"))
             .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("RATING"))
+            .addField(Types.optional(PrimitiveType.PrimitiveTypeName.BINARY).as(OriginalType.UTF8).named("ORDER_OPTION_ID"))
             .named("TicketOrder");
 
     private static final Logger logger = LoggerFactory.getLogger(TicketOrderToParquetConverter.class);
@@ -104,6 +105,7 @@ public class TicketOrderToParquetConverter {
             writeStringField("DELIVERY_METHOD", 14, ticketOrder.getDeliveryMethod());
             writeStringField("PAYMENT_METHOD", 15, ticketOrder.getPaymentMethod());
             writeStringField("RATING", 16, ticketOrder.getRating());
+            writeStringField("ORDER_OPTION_ID", 17, ticketOrder.getOrderOptionId());
 
             recordConsumer.endMessage();
         }

@@ -66,4 +66,7 @@ public class TicketOrder {
 
     @Column(name = "RATING")
     private String rating;
+
+    @Column(name = "ORDER_OPTION_ID")
+    private String orderOptionId;
 }

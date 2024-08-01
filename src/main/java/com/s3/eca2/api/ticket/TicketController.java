@@ -42,10 +42,12 @@ public class TicketController {
     public ResponseEntity<String> selectByDate(@RequestParam("start") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
                                                @RequestParam("end") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
 
+        LocalDate adjustedEnd = end.minusDays(1);  // end 날짜에서 하루 뺀 날짜
+
         DateTimeFormatter fileNameFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         DateTimeFormatter pathFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDateForFileName = start.format(fileNameFormatter);
-        String formattedDateForPath = start.format(pathFormatter);
+        String formattedDateForFileName = adjustedEnd.format(fileNameFormatter);  // 파일명에 사용할 날짜
+        String formattedDateForPath = adjustedEnd.format(pathFormatter);  // 경로에 사용할 날짜
 
         int pageNumber = 0;
         final int pageSize = 400000; // 한 페이지 당 처리할 데이터 수를 줄입니다.
@@ -79,6 +81,7 @@ public class TicketController {
             return ResponseEntity.internalServerError().body("Failed to create and upload Parquet files.");
         }
     }
+
 
     @GetMapping("/getParquet")
     public ResponseEntity<String> selectByPath(@RequestParam("s3key") String s3key) {
