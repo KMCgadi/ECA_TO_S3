@@ -11,16 +11,13 @@ server.port=8085
 server.servlet.encoding.charset=UTF-8
 server.servlet.encoding.force=true
 server.address=127.0.0.1
-
 # DB
 spring.datasource.url=jdbc:oracle:thin:@//172.16.11.75:1521/ecadb
 spring.datasource.username= your_name
 spring.datasource.password= your_password
-
 # JPA
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=true
-
 ## AWS S3
 #aws.s3.bucketName=gadi-s3-bukit-test
 #aws.s3.region=ap-northeast-2
